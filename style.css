@@ -1,0 +1,160 @@
+@font-face {
+    font-family: UbuntuMono;
+    src: url(MainFont.ttf);
+}
+
+* {
+	font-family: UbuntuMono;
+    table-align: center;
+	text-align: center;
+}
+
+body {
+    color: white;
+    background-color: #333;
+	overflow-x: hidden;
+	font-size: 16px;
+	margin: 0px;
+	user-select: none;
+}
+
+table, tr {
+    display: flex;
+    justify-content: center;
+}
+
+h1 {
+    display: inline;
+    font-size: 40px;
+}
+
+h2 {
+	display: inline;
+    font-size: 30px;
+}
+
+h3 {
+	display: inline;
+    font-size: 25px;
+}
+
+button {
+    padding: 5px 10px;
+    background-color: #222;
+    color: white;
+    border: none;
+    cursor: pointer;
+    max-width: 300px;
+}
+
+button.locked {
+    background-color: #181818;
+    cursor: default;
+}
+
+button:not(.locked):hover {
+    background-color: #282828;
+}
+
+.table_center {
+    display: flex;
+    justify-content: center;
+    flex-flow: row wrap;
+}
+
+.table_space {
+    display: flex;
+    justify-content: space-around;
+    flex-flow: row wrap;
+}
+
+.table_between {
+    display: flex;
+    justify-content: space-between;
+    flex-flow: row wrap;
+}
+
+.table_left {
+    display: flex;
+    justify-content: start;
+    flex-flow: row wrap;
+}
+
+.soft {
+	color: hsl(237, 15%, 47%);
+	font-weight: bold;
+	text-shadow: 0px 1px 0px hsl(252, 19%, 57%);
+	pointer-events: none;
+}
+
+#luck_list {
+    background-color: #222;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#luck_list > div {
+    position: relative;
+    margin: 5px;
+    width: calc(25% - 10px);
+    min-width: 250px;
+    height: 140px;
+
+    background-color: #282828;
+}
+
+#luck_list > div:first-child {
+    background-color: #333;
+    flex-grow: 1;
+}
+
+#luck_list > div:first-child::before {
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    content: "[Your Best Rarity]";
+}
+
+#bottom_div > button {
+    font-size: 24px;
+}
+
+#rolled_div {
+    width: 100%;
+    min-height: 82px;
+    background-color: #222;
+    margin-bottom: 10px;
+}
+
+.pres_btn {
+    width: 300px;
+    height: 80px;
+}
+
+.upgrades_div {
+    margin: 5px 0px;
+}
+.upgrades_div > div {
+    display: flex;
+    justify-content: center;
+    flex-flow: row wrap;
+}
+.upgrades_div > div > button {
+    width: 300px;
+    height: 120px;
+    font-size: 12px;
+    margin: 3px;
+}
+
+.pres_btn *,
+.upgrades_div > div > button * {
+    pointer-events: none;
+}
+
+#luck_mult {
+    position: absolute;
+    bottom: 150px;
+    left: 10px;
+}

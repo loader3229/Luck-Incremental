@@ -1,0 +1,55 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Luck Incremental made by MrRedShark77" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mrredshark77.github.io/Luck-Incremental/" />
+    <meta property="og:title" content="Luck Incremental" />
+
+    <link rel="icon" href="icon.png">
+
+    <script src="js/break_eternity.js"></script>
+    <script src="js/elements.js"></script>
+    <script src="js/saves.js"></script>
+    <script src="js/format.js"></script>
+    <script src="js/temp.js"></script>
+    <script src="js/calc.js"></script>
+
+    <script src="js/upgs.js"></script>
+    <script src="js/luck.js"></script>
+
+    <script src="js/main.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+
+    <title>Luck Incremental</title>
+</head>
+<body onload="loadGame()">
+    <input id="copy" style="position: absolute; top: 0; left: 0; user-select: all; visibility: hidden;">
+    <div id="app" style="display: none;">
+        <div id="rolled_div"></div>
+        <button class="pres_btn" id="pres_btn" onclick="MAIN.prestige.reset()">???</button>
+        <div class="upgrades_div" id="pp_upgrades_table"></div><br>
+        <button class="pres_btn" id="tran_btn" onclick="MAIN.trans.reset()">???</button>
+        <div class="upgrades_div" id="tp_upgrades_table"></div><br>
+
+        <div id="bottom_div" style="position: fixed; bottom: 0px; width: 100%;">
+            <button id="roll_btn" onclick="roll()">Roll</button>
+            <button onclick="show_luck_nav = !show_luck_nav">Show/Hide Rarity List</button>
+
+            <div id="luck_mult">Your luck multiplier: ???</div>
+
+            <div id="luck_list">
+                <div id="luck_ctn0"></div>
+                <div id="luck_ctn1"></div>
+                <div id="luck_ctn2"></div>
+                <div id="luck_ctn3"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
