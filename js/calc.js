@@ -6,5 +6,12 @@ function calc(dt) {
         roll()
     }
 
+    for (let i in UPGRADES) {
+        let a = UPGRADES[i].auto
+        if (a&&a()) for (let j in UPGRADES[i].ctn) buyUpgrade(i,j)
+    }
+
+    if (hasUpgrade('rp',4)) player.pp = player.pp.add(tmp.ppGain.mul(dt))
+
     //roll()
 }

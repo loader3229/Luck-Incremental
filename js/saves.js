@@ -82,6 +82,9 @@ function getPlayerData() {
 
         tp: E(0),
         tTimes: 0,
+
+        rp: E(0),
+        rTimes: 0,
     }
     for (let id in UPGRADES) s.upgrade[id] = new Array(UPGRADES[id].ctn.length).fill(E(0))
     return s

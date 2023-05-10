@@ -9,6 +9,8 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://mrredshark77.github.io/Luck-Incremental/" />
     <meta property="og:title" content="Luck Incremental" />
+    <meta property="og:description" content="Luck Incremental made by MrRedShark77." />
+    <meta property="og:image" content="https://mrredshark77.github.io/Luck-Incremental//icon.png" />
 
     <link rel="icon" href="icon.png">
 
@@ -32,16 +34,20 @@
     <input id="copy" style="position: absolute; top: 0; left: 0; user-select: all; visibility: hidden;">
     <div id="app" style="display: none;">
         <div id="rolled_div"></div>
+        <div id="luck_mult">Your luck multiplier: ???</div>
         <button class="pres_btn" id="pres_btn" onclick="MAIN.prestige.reset()">???</button>
         <div class="upgrades_div" id="pp_upgrades_table"></div><br>
         <button class="pres_btn" id="tran_btn" onclick="MAIN.trans.reset()">???</button>
         <div class="upgrades_div" id="tp_upgrades_table"></div><br>
+        <button class="pres_btn" id="rein_btn" onclick="MAIN.rein.reset()">???</button>
+        <div class="upgrades_div" id="rp_upgrades_table"></div><br>
+
+        <div style="height: 200px;"></div>
 
         <div id="bottom_div" style="position: fixed; bottom: 0px; width: 100%;">
             <button id="roll_btn" onclick="roll()">Roll</button>
             <button onclick="show_luck_nav = !show_luck_nav">Show/Hide Rarity List</button>
-
-            <div id="luck_mult">Your luck multiplier: ???</div>
+            <button onclick="save()">Save</button>
 
             <div id="luck_list">
                 <div id="luck_ctn0"></div>
@@ -50,6 +56,8 @@
                 <div id="luck_ctn3"></div>
             </div>
         </div>
+
+        <div id="version">Version v0.1 (10.05.23)</div>
     </div>
 </body>
 </html>

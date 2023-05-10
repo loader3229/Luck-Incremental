@@ -2,7 +2,7 @@ const LUCK = {
     mult() {
         let x = E(1)
 
-        x = x.mul(upgradeEffect('pp',0)[1]).mul(upgradeEffect('tp',0)[1])
+        x = x.mul(upgradeEffect('pp',0)[1]).mul(upgradeEffect('tp',0)[1]).mul(upgradeEffect('rp',0)[1])
 
         return x
     },
@@ -14,7 +14,7 @@ const LUCK = {
         return x
     },
     generate() {
-        let r = Decimal.pow(Math.random(),-1).pow(tmp.luckPow).mul(tmp.luckMult).log(tmp.luckBase).scale(100,2,0,true)
+        let r = Decimal.pow(Math.random(),-1).pow(tmp.luckPow).mul(tmp.luckMult).log(tmp.luckBase).scale(tmp.raritySS,2,0,true).scale(1000,1.001,1,true)
 
         //r = r.min(player.max_rarity.add(1))
 
@@ -23,7 +23,7 @@ const LUCK = {
 }
 
 const RARITY_PREFIX = [
-    ["Common","Uncommon","Rare",'Unique',"Epic","Legendary",'Mythic','Divine','Almighty','Phenomenal','Preeminent','Inimitable','Exotic','Ethereal','Scarce','Superior','Astronia','Affinity','Noviax','Endre','Abyxtic'],
+    ["Common","Uncommon","Rare",'Unique',"Epic","Legendary",'Mythic','Divine','Almighty','Phenomenal','Preeminent','Inlimitable','Exotic','Ethereal','Scarce','Superior','Astronia','Affinity','Noviax','Endre','Abyxtic'],
     ['',"Kilo","Mega","Giga",'Tera','Peta','Exa','Zetta','Yotta','Xenna','Weka','Vendeka','Uda','Tradaka','Sorta','Rinta','Quexa','Pepta','Ocha','Nena','Minga','Luma','Kema','Jretta','Iqatta','Huitta','Gatextta','Feqesa','Encsenda','Desyta','Ceanata','Bevvgta','Avta'],
     ['','Meta','Hyper','Ultra','Omni','Mesko','Omega'],
 ]
@@ -55,11 +55,11 @@ function getRarityName(i) {
         }
     }
 
-    return h+` [#${format(i,0)}]`
+    return h+` [${format(i,0)}σ]`
 }
 
 function getRarityChance(i) {
-    let x = Decimal.pow(tmp.luckBase,i.scale(100,2,0)).div(tmp.luckMult).root(tmp.luckPow)
+    let x = Decimal.pow(tmp.luckBase,i.scale(1000,1.001,1).scale(tmp.raritySS,2,0)).div(tmp.luckMult).root(tmp.luckPow)
 
     return x.max(1)
 }
@@ -78,6 +78,8 @@ function roll() {
 }
 
 tmp_update.push(()=>{
+    tmp.raritySS = E(100).add(upgradeEffect('tp',4,0))
+
     tmp.luckBase = 1.25
     tmp.rollInt = 1-upgradeEffect('pp',1,0)
     tmp.luckMult = LUCK.mult()

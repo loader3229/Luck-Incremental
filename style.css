@@ -153,8 +153,10 @@ button:not(.locked):hover {
     pointer-events: none;
 }
 
-#luck_mult {
+#version {
     position: absolute;
-    bottom: 150px;
-    left: 10px;
+    top: 2px;
+    left: 2px;
+    font-size: 10px;
+    color: #fff2;
 }

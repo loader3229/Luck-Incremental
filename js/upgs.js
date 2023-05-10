@@ -1,6 +1,9 @@
 const UPGRADES = {
     pp: {
         res: ["PP",()=>[player,'pp'],"Prestige Points (PP)"],
+        unl: ()=>player.pTimes>0,
+
+        auto: () => hasUpgrade('rp',3),
 
         ctn: [
             {
@@ -9,6 +12,8 @@ const UPGRADES = {
                 bulk: i => i.log(3),
 
                 effect(i) {
+                    i = i.mul(upgradeEffect('pp',3))
+
                     let b = Decimal.add(upgradeEffect('pp',2),2)
                     let x = b.pow(i)
 
@@ -21,6 +26,8 @@ const UPGRADES = {
                 bulk: i => i.div(10).log(5),
 
                 effect(i) {
+                    i = i.mul(upgradeEffect('pp',3))
+
                     let x = 1-Decimal.pow(0.8,i.root(2)).toNumber()
 
                     return x
@@ -32,17 +39,31 @@ const UPGRADES = {
                 bulk: i => i.div(1e3).log(10),
 
                 effect(i) {
+                    i = i.mul(upgradeEffect('pp',3))
+
                     let x = i.div(2)
                     if (hasUpgrade('tp',3)) x = x.mul(2)
                     return x
                 },
                 effDesc: x => "+"+format(x,1),
+            },{
+                unl: () => player.tTimes>0,
+
+                desc: () => `Previous prestige upgrades are +2.5% stronger per level.`,
+                cost: i => Decimal.pow(10,i.pow(2)).mul(1e18),
+                bulk: i => i.div(1e18).log(10).root(2),
+
+                effect(i) {
+                    let x = i.mul(0.025).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
             },
         ],
     },
     tp: {
         res: ["TP",()=>[player,'tp'],"Transcension Points (TP)"],
-        unl: ()=>player.pTimes>0,
+        unl: ()=>player.tTimes>0,
 
         ctn: [
             {
@@ -60,8 +81,8 @@ const UPGRADES = {
                 effDesc: x => formatMult(x[1]),
             },{
                 desc: () => `Double prestige points gain.`,
-                cost: i => Decimal.pow(3,i),
-                bulk: i => i.log(3),
+                cost: i => Decimal.pow(3,i.scale(100,2,0)),
+                bulk: i => i.log(3).scale(100,2,0,true),
 
                 effect(i) {
                     let x = Decimal.pow(2,i)
@@ -85,6 +106,70 @@ const UPGRADES = {
 
                 desc: () => `PU3 is twice as stronger, and it affects TU1's base.`,
                 cost: i => E(1e4),
+            },{
+                unl: () => player.rTimes>0,
+
+                desc: () => `Post-100σ rarity scaling starts +10 later per level.`,
+                cost: i => Decimal.pow(10,i.pow(1.5)).mul(1e45),
+                bulk: i => i.div(1e45).log(10).root(1.5),
+
+                effect(i) {
+                    let x = i.mul(10)
+                    return x
+                },
+                effDesc: x => "+"+x.format(0)+" later",
+            },
+        ],
+    },
+    rp: {
+        res: ["RP",()=>[player,'rp'],"Reincarnation Points (RP)"],
+        unl: ()=>player.rTimes>0,
+
+        ctn: [
+            {
+                desc: () => `Increase luck by ${formatMult(upgradeEffect('rp',0)[0])} every level.`,
+                cost: i => Decimal.pow(3,i.pow(1.25)),
+                bulk: i => i.log(3).root(1.25),
+
+                effect(i) {
+                    let b = E(200)
+                    let x = b.pow(i)
+
+                    return [b,x]
+                },
+                effDesc: x => formatMult(x[1]),
+            },{
+                desc: () => `Multiply prestige points gain by 10.`,
+                cost: i => Decimal.pow(3,i.pow(1.25)),
+                bulk: i => i.log(3).root(1.25),
+
+                effect(i) {
+                    let x = Decimal.pow(10,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                desc: () => `Double trancension points gain.`,
+                cost: i => Decimal.pow(3,i.pow(1.25)),
+                bulk: i => i.log(3).root(1.25),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                oneTime: true,
+
+                desc: () => `Automate PUs, and they no longer spend anything.`,
+                cost: i => E(1e4),
+            },{
+                oneTime: true,
+
+                desc: () => `Passively gain 100% of PP gained on reset every second.`,
+                cost: i => E(1e9),
             },
         ],
     },
@@ -107,6 +192,7 @@ function updateUpgradesTemp(id) {
     let [p,q] = us.res[1]()
 
     tu.res = p[q]
+    tu.noSpend = us.auto&&us.auto()
 
     for (let i in us.ctn) {
         let u = us.ctn[i], lvl = getUpgradeBought(id,i)
@@ -142,7 +228,13 @@ function updateUpgradesHTML(id) {
     tmp.el[id+"_upgs_res"].setHTML(res.format(0))
 
     for (let i in us.ctn) {
-        let u = us.ctn[i], lvl = getUpgradeBought(id,i), u_el = tmp.el[id+"_upg"+i], h = "", cost = tu.cost[i]
+        let u = us.ctn[i], u_el = tmp.el[id+"_upg"+i], unl = !u.unl||u.unl()
+
+        u_el.setDisplay(unl)
+
+        if (!unl) continue;
+
+        let lvl = getUpgradeBought(id,i), cost = tu.cost[i], h = ""
 
         if (!u.oneTime) h += "[Level " + lvl.format(0) + "]<br>" 
         h += u.desc()
@@ -161,20 +253,28 @@ function buyUpgrade(id,i) {
 
     if (res.gte(cost)) {
         if (uu.oneTime) {
-            let [p,q] = u.res[1]()
-            p[q] = p[q].sub(cost)
+            if (!tu.noSpend) {
+                let [p,q] = u.res[1]()
+                p[q] = p[q].sub(cost)
+            }
+
             player.upgrade[id][i] = E(1)
         } else {
             let bulk = u.ctn[i].bulk(res).add(1).floor()
 
             if (getUpgradeBought(id,i).lt(bulk)) {
-                cost = u.ctn[i].cost(bulk.sub(1))
+                if (!tu.noSpend) {
+                    cost = u.ctn[i].cost(bulk.sub(1))
 
-                let [p,q] = u.res[1]()
-                p[q] = p[q].sub(cost)
+                    let [p,q] = u.res[1]()
+                    p[q] = p[q].sub(cost)
+                }
+
                 player.upgrade[id][i] = bulk
             }
         }
+
+        updateUpgradesTemp(id)
     }
 }
 
