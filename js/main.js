@@ -17,7 +17,7 @@ const MAIN = {
 
             x = x.mul(upgradeEffect('tp',1)).mul(upgradeEffect('rp',1))
 
-            return x
+            return x.floor()
         },
         reset() {
             if (player.max_rarity.gte(15)) {
@@ -41,7 +41,7 @@ const MAIN = {
             
             x = x.mul(upgradeEffect('rp',2))
 
-            return x
+            return x.floor()
         },
         reset() {
             if (player.max_rarity.gte(100)) {
@@ -65,7 +65,7 @@ const MAIN = {
             r = r.add(1).root(2)
             let x = Decimal.pow(1.1,r).mul(r.add(1)).mul(player.tp.div(1e9).max(1).root(3))
 
-            return x
+            return x.floor()
         },
         reset() {
             if (player.max_rarity.gte(300)) {
