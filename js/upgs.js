@@ -1,5 +1,6 @@
 const UPGRADES = {
     pp: {
+        tab: 0,
         res: ["PP",()=>[player,'pp'],"Prestige Points (PP)"],
         unl: ()=>player.pTimes>0,
 
@@ -58,12 +59,27 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },{
+                unl: () => player.mastery_tier>0,
+
+                desc: () => `Double mastery essence gain.`,
+                cost: i => Decimal.pow(1e5,i.pow(2)).mul(1e100),
+                bulk: i => i.div(1e100).log(1e5).root(2),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+                    return x
+                },
+                effDesc: x => formatMult(x),
             },
         ],
     },
     tp: {
+        tab: 0,
         res: ["TP",()=>[player,'tp'],"Transcension Points (TP)"],
         unl: ()=>player.tTimes>0,
+
+        auto: () => hasUpgrade('es',2),
 
         ctn: [
             {
@@ -72,6 +88,8 @@ const UPGRADES = {
                 bulk: i => i.log(3),
 
                 effect(i) {
+                    i = i.mul(upgradeEffect('tp',5))
+
                     let b = E(10)
                     if (hasUpgrade('tp',3)) b = b.add(upgradeEffect('pp',2))
                     let x = b.pow(i)
@@ -85,6 +103,8 @@ const UPGRADES = {
                 bulk: i => i.log(3).scale(100,2,0,true),
 
                 effect(i) {
+                    i = i.mul(upgradeEffect('tp',5))
+
                     let x = Decimal.pow(2,i)
 
                     return x
@@ -96,6 +116,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e2).log(10).root(2),
 
                 effect(i) {
+                    i = i.mul(upgradeEffect('tp',5))
+
                     let x = i.add(1).root(2)
 
                     return x
@@ -114,14 +136,29 @@ const UPGRADES = {
                 bulk: i => i.div(1e45).log(10).root(1.5),
 
                 effect(i) {
+                    i = i.mul(upgradeEffect('tp',5))
+
                     let x = i.mul(10)
                     return x
                 },
                 effDesc: x => "+"+x.format(0)+" later",
+            },{
+                unl: () => player.mastery_tier>0,
+
+                desc: () => `Previous transcension upgrades are +2.5% stronger per level.`,
+                cost: i => Decimal.pow(10,i.scale(5,2,0).pow(2)).mul(1e90),
+                bulk: i => i.div(1e90).log(10).root(2).scale(5,2,0,true),
+
+                effect(i) {
+                    let x = i.mul(0.025).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
             },
         ],
     },
     rp: {
+        tab: 0,
         res: ["RP",()=>[player,'rp'],"Reincarnation Points (RP)"],
         unl: ()=>player.rTimes>0,
 
@@ -173,6 +210,68 @@ const UPGRADES = {
             },
         ],
     },
+    es: {
+        tab: 1,
+        res: ["Mastery Essence",()=>[player,'mastery_essence'],"Mastery Essence"],
+        unl: ()=>player.mastery_tier>0,
+
+        ctn: [
+            {
+                desc: () => `Increase luck by ${formatMult(upgradeEffect('es',0)[0])} every level (based on mastery essence).`,
+                cost: i => Decimal.pow(2,i).mul(10),
+                bulk: i => i.div(10).log(2),
+
+                effect(i) {
+                    let b = player.mastery_essence.add(10).log10().mul(10)
+                    let x = b.pow(i)
+
+                    return [b,x]
+                },
+                effDesc: x => formatMult(x[1]),
+            },{
+                desc: () => `Increase PP by ${formatMult(upgradeEffect('es',1)[0])} every level (based on PP).`,
+                cost: i => Decimal.pow(3,i).mul(100),
+                bulk: i => i.div(100).log(3),
+
+                effect(i) {
+                    let b = player.pp.add(10).log10()
+                    let x = b.pow(i)
+
+                    return [b,x]
+                },
+                effDesc: x => formatMult(x[1]),
+            },{
+                oneTime: true,
+
+                desc: () => `Automate TUs, and they no longer spend anything. Keep pre-mastery automation upgrades on reset.`,
+                cost: i => E(1e4),
+            },{
+                desc: () => `Increase TP by ${formatMult(upgradeEffect('es',3)[0])} every level (based on TP).`,
+                cost: i => Decimal.pow(4,i).mul(1e4),
+                bulk: i => i.div(1e4).log(4),
+
+                effect(i) {
+                    let b = player.tp.add(10).log10()
+                    let x = b.pow(i)
+
+                    return [b,x]
+                },
+                effDesc: x => formatMult(x[1]),
+            },{
+                desc: () => `Increase RP by ${formatMult(upgradeEffect('es',4)[0])} every level (based on RP).`,
+                cost: i => Decimal.pow(5,i).mul(1e6),
+                bulk: i => i.div(1e6).log(5),
+
+                effect(i) {
+                    let b = player.rp.add(10).log10()
+                    let x = b.pow(i)
+
+                    return [b,x]
+                },
+                effDesc: x => formatMult(x[1]),
+            },
+        ],
+    },
 }
 
 const UPG_START_COST = (()=>{
@@ -219,7 +318,11 @@ function setupUpgradesHTML(id) {
 }
 
 function updateUpgradesHTML(id) {
-    let us = UPGRADES[id], tu = tmp.upgs[id], res = tu.res, unl = !us.unl||us.unl()
+    let us = UPGRADES[id]
+
+    if (tab != us.tab||0) return;
+    
+    let tu = tmp.upgs[id], res = tu.res, unl = !us.unl||us.unl()
 
     tmp.el[id+"_upgrades_table"].setDisplay(unl)
 
@@ -278,8 +381,8 @@ function buyUpgrade(id,i) {
     }
 }
 
-function resetUpgrades(id) {
-    for (let i in UPGRADES[id].ctn) player.upgrade[id][i] = E(0)
+function resetUpgrades(id, keep=[]) {
+    for (let i in UPGRADES[id].ctn) if (!keep.includes(parseInt(i))) player.upgrade[id][i] = E(0)
 }
 
 tmp_update.push(()=>{

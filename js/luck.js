@@ -2,7 +2,9 @@ const LUCK = {
     mult() {
         let x = E(1)
 
-        x = x.mul(upgradeEffect('pp',0)[1]).mul(upgradeEffect('tp',0)[1]).mul(upgradeEffect('rp',0)[1])
+        x = x.mul(upgradeEffect('pp',0)[1]).mul(upgradeEffect('tp',0)[1]).mul(upgradeEffect('rp',0)[1]).mul(upgradeEffect('es',0)[1])
+
+        x = x.pow(tmp.mTierEff.luck||1)
 
         return x
     },

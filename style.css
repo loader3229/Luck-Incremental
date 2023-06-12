@@ -13,8 +13,9 @@ body {
     color: white;
     background-color: #333;
 	overflow-x: hidden;
+    overflow-y: scroll;
 	font-size: 16px;
-	margin: 0px;
+	margin: 0px 0px 0px 60px;
 	user-select: none;
 }
 
@@ -36,6 +37,19 @@ h2 {
 h3 {
 	display: inline;
     font-size: 25px;
+}
+
+*::-webkit-scrollbar {
+    width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    background-color: #0000;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
 }
 
 button {
@@ -159,4 +173,27 @@ button:not(.locked):hover {
     left: 2px;
     font-size: 10px;
     color: #fff2;
+}
+
+#tabs {
+    position: fixed;
+    top: 50%;
+    height: 100%;
+    left: 0px;
+    transform: translateY(-50%);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#tabs > button {
+    width: 50px;
+    height: 50px;
+    border: solid 2px white;
+    margin: 3px;
+
+    font-size: 24px;
+    font-weight: bold;
 }

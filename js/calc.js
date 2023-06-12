@@ -13,5 +13,7 @@ function calc(dt) {
 
     if (hasUpgrade('rp',4)) player.pp = player.pp.add(tmp.ppGain.mul(dt))
 
+    player.mastery_essence = player.mastery_essence.add(tmp.essGain.mul(dt))
+
     //roll()
 }

@@ -8,6 +8,8 @@ function resetTemp() {
         luckMult: E(1),
         luckPow: E(1),
 
+        mTierEff: {},
+
         upgs: {},
     }
 

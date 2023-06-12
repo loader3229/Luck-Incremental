@@ -24,6 +24,7 @@
     <script src="js/upgs.js"></script>
     <script src="js/luck.js"></script>
 
+    <script src="js/tab.js"></script>
     <script src="js/main.js"></script>
 
     <link rel="stylesheet" href="style.css">
@@ -35,16 +36,22 @@
     <div id="app" style="display: none;">
         <div id="rolled_div"></div>
         <div id="luck_mult">Your luck multiplier: ???</div>
-        <button class="pres_btn" id="pres_btn" onclick="MAIN.prestige.reset()">???</button>
-        <div class="upgrades_div" id="pp_upgrades_table"></div><br>
-        <button class="pres_btn" id="tran_btn" onclick="MAIN.trans.reset()">???</button>
-        <div class="upgrades_div" id="tp_upgrades_table"></div><br>
-        <button class="pres_btn" id="rein_btn" onclick="MAIN.rein.reset()">???</button>
-        <div class="upgrades_div" id="rp_upgrades_table"></div><br>
+
+        <div id="tab_div0">
+            <button class="pres_btn" id="pres_btn" onclick="MAIN.prestige.reset()">???</button>
+            <div class="upgrades_div" id="pp_upgrades_table"></div><br>
+            <button class="pres_btn" id="tran_btn" onclick="MAIN.trans.reset()">???</button>
+            <div class="upgrades_div" id="tp_upgrades_table"></div><br>
+            <button class="pres_btn" id="rein_btn" onclick="MAIN.rein.reset()">???</button>
+            <div class="upgrades_div" id="rp_upgrades_table"></div><br>
+        </div><div id="tab_div1">
+            <button class="pres_btn" id="mastery_btn" onclick="MAIN.mastery.reset()">???</button>
+            <div id="mastery_tier">Your Mastery Tier is <h3>0</h3>, which boosts luck by <h3>^1.00</h3> and generates <h3>0.00</h3> Mastery Essence every second.</div>
+            <div class="upgrades_div" id="es_upgrades_table"></div><br>
+        </div>
 
         <div style="height: 200px;"></div>
-
-        <div id="bottom_div" style="position: fixed; bottom: 0px; width: 100%;">
+        <div id="bottom_div" style="position: fixed; bottom: 0px; width: calc(100% - 60px);">
             <button id="roll_btn" onclick="roll()">Roll</button>
             <button onclick="show_luck_nav = !show_luck_nav">Show/Hide Rarity List</button>
             <button onclick="save()">Save</button>
@@ -56,8 +63,8 @@
                 <div id="luck_ctn3"></div>
             </div>
         </div>
-
-        <div id="version">Version v0.1 (12.05.23 due github issue)</div>
+        <div id="tabs"></div>
+        <div id="version">Version v0.2 (12.06.23)</div>
     </div>
 </body>
 </html>
