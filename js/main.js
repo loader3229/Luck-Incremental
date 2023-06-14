@@ -86,7 +86,7 @@ const MAIN = {
     },
     mastery: {
         req() {
-            let x = 1000 + 500 * player.mastery_tier
+            let x = 750 + 600 * player.mastery_tier
 
             return x
         },
