@@ -29,7 +29,7 @@ const UPGRADES = {
                 effect(i) {
                     i = i.mul(upgradeEffect('pp',3))
 
-                    let x = Decimal.pow(1.25,i.root(2));
+                    let x = Decimal.pow(1.25,i.root(hasUpgrade('pp',5)?1.8:2));
 
                     return x
                 },
@@ -44,6 +44,7 @@ const UPGRADES = {
 
                     let x = i.div(2)
                     if (hasUpgrade('tp',3)) x = x.mul(2)
+					if (hasUpgrade('rp',7)) x = x.mul(1.5)
                     return x
                 },
                 effDesc: x => "+"+format(x,1),
@@ -71,6 +72,11 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => formatMult(x),
+            },{
+                oneTime: true,
+
+                desc: () => `PU2 is better.`,
+                cost: i => E("1e555"),
             },
         ],
     },
@@ -159,6 +165,18 @@ const UPGRADES = {
 
                 desc: () => `Auto-Update your best rarity based on luck.`,
                 cost: i => E(1e7),
+            },{
+                unl: () => player.mastery_tier>0,
+
+                desc: () => `Double mastery essence gain.`,
+                cost: i => Decimal.pow(1e5,i.pow(2)).mul("1e450"),
+                bulk: i => i.div("1e450").log(1e5).root(2),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+                    return x
+                },
+                effDesc: x => formatMult(x),
             },
         ],
     },
@@ -166,6 +184,8 @@ const UPGRADES = {
         tab: 0,
         res: ["RP",()=>[player,'rp'],"Reincarnation Points (RP)"],
         unl: ()=>player.rTimes>0,
+
+        auto: () => hasUpgrade('es',9),
 
         ctn: [
             {
@@ -175,6 +195,7 @@ const UPGRADES = {
 
                 effect(i) {
                     let b = E(200)
+                    if (hasUpgrade('rp',7)) b = b.add(upgradeEffect('pp',2))
                     let x = b.pow(i)
 
                     return [b,x]
@@ -235,6 +256,11 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => "^"+format(x),
+            },{
+                oneTime: true,
+
+                desc: () => `PU3 is 1.5x stronger, and it affects RU1's base.`,
+                cost: i => E(1e139),
             },
         ],
     },
@@ -319,6 +345,45 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => formatMult(x),
+            },{
+                desc: () => `Double mastery essence gain.`,
+                cost: i => Decimal.pow(10,i).mul(1e13),
+                bulk: i => i.div(1e13).log(10),
+				
+                effect(i) {
+                    let x = E(2).pow(i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                desc: () => `Improve randomizer better.`,
+                cost: i => Decimal.pow(10,i).mul(1e20),
+                bulk: i => i.div(1e20).log(10),
+
+                effect(i) {
+
+                    let x = i.add(1)
+
+                    return x
+                },
+                effDesc: x => "^"+format(x),
+            },{
+                oneTime: true,
+
+                desc: () => `Automate RUs, and they no longer spend anything.`,
+                cost: i => E(1e25),
+            },{
+                desc: () => `Passively gain RP every second.`,
+                cost: i => Decimal.pow(10,i).mul(1e30),
+                bulk: i => i.div(1e30).log(10),
+				
+                effect(i) {
+                    let x = i
+
+                    return x
+                },
+                effDesc: x => formatPercent(x)+" of RP gained ("+format(tmp.rpGain.mul(x))+")",
             },
         ],
     },

@@ -87,9 +87,12 @@ const MAIN = {
     mastery: {
         req() {
 			if(player.mastery_tier==0)return 777;
-			if(player.mastery_tier>=10)return 1e100;
+				
+			if(player.mastery_tier>=30)return 1e100;
             let x = 500 + 600 * player.mastery_tier;
 
+			if(player.mastery_tier>=10)x = 600 * player.mastery_tier + 5 * (player.mastery_tier**2);
+			
             return x
         },
         reset() {
@@ -110,12 +113,12 @@ const MAIN = {
 
             let x = Math.pow(t+1,1/3)
 
-            let y = Decimal.pow(10,t-1).mul(t)
+            let y = Decimal.pow(10,(t>=20?t/2+10:t)-1).mul(t)
 
             return {luck: x, gen: y}
         },
         essGain() {
-            let x = tmp.mTierEff.gen.mul(upgradeEffect('pp',4))
+            let x = tmp.mTierEff.gen.mul(upgradeEffect('pp',4)).mul(upgradeEffect('tp',7)).mul(upgradeEffect('es',7))
 
             return x
         },

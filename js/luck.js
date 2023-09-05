@@ -11,7 +11,7 @@ const LUCK = {
     pow() {
         let x = E(1)
 
-        x = x.mul(upgradeEffect('tp',2)).mul(upgradeEffect('rp',6))
+        x = x.mul(upgradeEffect('tp',2)).mul(upgradeEffect('rp',6)).mul(upgradeEffect('es',8))
 
         return x
     },
@@ -25,9 +25,16 @@ const LUCK = {
         return r.floor()
     },
     generateBulk(step) {
-        let r = Decimal.pow(E(1).sub(Decimal.pow(Math.random(),step.pow(-1))),-1).pow(tmp.luckPow).mul(tmp.luckMult).log(tmp.luckBase).scale(tmp.raritySS,2,0,true)//.scale(1000,1.001,1,true)
+		let mult = E(1)
+		if(step.gte(1e6)){
+			mult = step.div(1e6)
+			step = E(1e6)
+		}
 		
-		while(Decimal.isNaN(r))r = Decimal.pow(E(1).sub(Decimal.pow(Math.random(),step.pow(-1))),-1).pow(tmp.luckPow).mul(tmp.luckMult).log(tmp.luckBase).scale(tmp.raritySS,2,0,true)//.scale(1000,1.001,1,true)
+		
+        let r = Decimal.pow(E(1).sub(Decimal.pow(Math.random(),step.pow(-1))),-1).mul(mult).pow(tmp.luckPow).mul(tmp.luckMult).log(tmp.luckBase).scale(tmp.raritySS,2,0,true)//.scale(1000,1.001,1,true)
+		
+		while(Decimal.isNaN(r))r = Decimal.pow(E(1).sub(Decimal.pow(Math.random(),step.pow(-1))),-1).mul(mult).pow(tmp.luckPow).mul(tmp.luckMult).log(tmp.luckBase).scale(tmp.raritySS,2,0,true)//.scale(1000,1.001,1,true)
 			
 		//r = r.min(player.max_rarity.add(1))
 

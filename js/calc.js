@@ -15,6 +15,8 @@ function calc(dt) {
 
     if (hasUpgrade('es',5)) player.tp = player.tp.add(tmp.tpGain.mul(dt).mul(tmp.upgs.es.effect[5]))
 
+    if (hasUpgrade('es',10)) player.rp = player.rp.add(tmp.rpGain.mul(dt).mul(tmp.upgs.es.effect[10]))
+
     player.mastery_essence = player.mastery_essence.add(tmp.essGain.mul(dt))
 
 	if (hasUpgrade('tp',6)||hasUpgrade('rp',5)) player.max_rarity = player.max_rarity.max(LUCK.update())
