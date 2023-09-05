@@ -53,7 +53,7 @@ const MAIN = {
         },
         doReset() {
             player.pp = E(0)
-            resetUpgrades('pp',hasUpgrade('es',2)?[1]:[])
+            resetUpgrades('pp',hasUpgrade('es',2)?[1,6]:[])
 
             MAIN.prestige.doReset()
         },
@@ -79,14 +79,16 @@ const MAIN = {
         },
         doReset() {
             player.tp = E(0)
-            resetUpgrades('tp')
+            resetUpgrades('tp', hasUpgrade('es',2)?[6]:[])
 
             MAIN.trans.doReset()
         },
     },
     mastery: {
         req() {
-            let x = 750 + 600 * player.mastery_tier
+			if(player.mastery_tier==0)return 777;
+			if(player.mastery_tier>=10)return 1e100;
+            let x = 500 + 600 * player.mastery_tier;
 
             return x
         },

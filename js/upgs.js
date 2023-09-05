@@ -29,11 +29,11 @@ const UPGRADES = {
                 effect(i) {
                     i = i.mul(upgradeEffect('pp',3))
 
-                    let x = 1-Decimal.pow(0.8,i.root(2)).toNumber()
+                    let x = Decimal.pow(1.25,i.root(2));
 
                     return x
                 },
-                effDesc: x => "-"+format(x),
+                effDesc: x => "/"+format(x),
             },{
                 desc: () => `Increase PU1's base by +0.5 every level.`,
                 cost: i => Decimal.pow(10,i).mul(1e3),
@@ -132,8 +132,8 @@ const UPGRADES = {
                 unl: () => player.rTimes>0,
 
                 desc: () => `Post-100σ rarity scaling starts +10 later per level.`,
-                cost: i => Decimal.pow(10,i.pow(1.5)).mul(1e45),
-                bulk: i => i.div(1e45).log(10).root(1.5),
+                cost: i => Decimal.pow(10,i.pow(3)).mul(1e60),
+                bulk: i => i.div(1e60).log(10).root(3),
 
                 effect(i) {
                     i = i.mul(upgradeEffect('tp',5))
@@ -154,6 +154,11 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },{
+                oneTime: true,
+
+                desc: () => `Auto-Update your best rarity based on luck.`,
+                cost: i => E(1e7),
             },
         ],
     },
@@ -203,10 +208,33 @@ const UPGRADES = {
                 desc: () => `Automate PUs, and they no longer spend anything.`,
                 cost: i => E(1e4),
             },{
+                desc: () => `Passively gain PP every second.`,
+                cost: i => Decimal.pow(3,i.pow(1.25)).mul(1e9),
+                bulk: i => i.div(1e9).log(3).root(1.25),
+				
+                effect(i) {
+                    let x = i.mul(tmp.upgs.es.effect[6]);
+
+                    return x
+                },
+                effDesc: x => formatPercent(x)+" of PP gained ("+format(tmp.ppGain.mul(x))+")",
+            },{
                 oneTime: true,
 
-                desc: () => `Passively gain 100% of PP gained on reset every second.`,
-                cost: i => E(1e9),
+                desc: () => `Auto-Update your best rarity based on luck.`,
+                cost: i => E(1e7),
+            },{
+                desc: () => `Improve randomizer better.`,
+                cost: i => Decimal.pow(10,i).mul(1e65),
+                bulk: i => i.div(1e65).log(10),
+
+                effect(i) {
+
+                    let x = i.add(1).root(2)
+
+                    return x
+                },
+                effDesc: x => "^"+format(x),
             },
         ],
     },
@@ -269,6 +297,28 @@ const UPGRADES = {
                     return [b,x]
                 },
                 effDesc: x => formatMult(x[1]),
+            },{
+                desc: () => `Passively gain TP every second.`,
+                cost: i => Decimal.pow(3,i).mul(3e8),
+                bulk: i => i.div(3e8).log(3),
+				
+                effect(i) {
+                    let x = i
+
+                    return x
+                },
+                effDesc: x => formatPercent(x)+" of TP gained ("+format(tmp.tpGain.mul(x))+")",
+            },{
+                desc: () => `Multiply PP passive gain upgrade.`,
+                cost: i => Decimal.pow(3,i).mul(1e11),
+                bulk: i => i.div(1e11).log(3),
+				
+                effect(i) {
+                    let x = i.add(1)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
             },
         ],
     },
