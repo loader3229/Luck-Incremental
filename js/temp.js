@@ -21,7 +21,7 @@ function resetTemp() {
         }
     }
 	
-	tmp.rollInt=1;
+	tmp.rollInt=E(1);
 }
 
 function updateTemp() {
