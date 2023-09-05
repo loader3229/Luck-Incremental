@@ -2,7 +2,7 @@ const LUCK = {
     mult() {
         let x = E(1)
 
-        x = x.mul(upgradeEffect('pp',0)[1]).mul(upgradeEffect('tp',0)[1]).mul(upgradeEffect('rp',0)[1]).mul(upgradeEffect('es',0)[1])
+        x = x.mul(upgradeEffect('pp',0)[1]).mul(upgradeEffect('tp',0)[1]).mul(upgradeEffect('rp',0)[1]).mul(upgradeEffect('ap',0)[1]).mul(upgradeEffect('es',0)[1])
 
         x = x.pow(tmp.mTierEff.luck||1)
 
@@ -124,7 +124,7 @@ function roll() {
 }
 
 tmp_update.push(()=>{
-    tmp.raritySS = E(100).add(upgradeEffect('tp',4,0))
+    tmp.raritySS = E(100).add(upgradeEffect('tp',4,0)).add(upgradeEffect('pp',6,0))
 
     tmp.luckBase = 1.25
     tmp.rollInt = upgradeEffect('pp',1,0).pow(-1)

@@ -86,6 +86,9 @@ function getPlayerData() {
         rp: E(0),
         rTimes: 0,
 
+        ap: E(0),
+        aTimes: 0,
+
         mastery_tier: 0,
         mastery_essence: E(0),
     }

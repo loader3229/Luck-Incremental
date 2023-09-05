@@ -23,8 +23,8 @@ const UPGRADES = {
                 effDesc: x => formatMult(x[1]),
             },{
                 desc: () => `Decrease auto-roll interval.`,
-                cost: i => Decimal.pow(5,i).mul(10),
-                bulk: i => i.div(10).log(5),
+                cost: i => Decimal.pow(5,i.scale(1000,1.001,1)).mul(10),
+                bulk: i => i.div(10).log(5).scale(1000,1.001,1,true),
 
                 effect(i) {
                     i = i.mul(upgradeEffect('pp',3))
@@ -73,10 +73,24 @@ const UPGRADES = {
                 },
                 effDesc: x => formatMult(x),
             },{
+                unl: () => player.mastery_tier>0,
+
                 oneTime: true,
 
                 desc: () => `PU2 is better.`,
                 cost: i => E("1e555"),
+            },{
+                unl: () => player.mastery_tier>0,
+
+                desc: () => `Post-100σ rarity scaling starts +5 later per level.`,
+                cost: i => Decimal.pow(10,i.pow(3)).mul("1e1450"),
+                bulk: i => i.div("1e1450").log(10).root(3),
+
+                effect(i) {
+                    let x = i.mul(5)
+                    return x
+                },
+                effDesc: x => "+"+x.format(0)+" later",
             },
         ],
     },
@@ -264,11 +278,68 @@ const UPGRADES = {
             },
         ],
     },
+    ap: {
+        tab: 0,
+        res: ["AP",()=>[player,'ap'],"Ascension Points (AP)"],
+        unl: ()=>player.aTimes>0,
+
+        auto: () => hasUpgrade('es',11),
+
+        ctn: [
+            {
+                desc: () => `Increase luck by ${formatMult(upgradeEffect('ap',0)[0])} every level.`,
+                cost: i => Decimal.pow(1.2,i),
+                bulk: i => i.log(1.2),
+
+                effect(i) {
+                    let b = E(10000)
+                    let x = b.pow(i)
+
+                    return [b,x]
+                },
+                effDesc: x => formatMult(x[1]),
+            },{
+                desc: () => `Multiply prestige points gain by 10,000.`,
+                cost: i => Decimal.pow(1.2,i),
+                bulk: i => i.log(1.2),
+
+                effect(i) {
+                    let x = Decimal.pow(10000,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                desc: () => `Multiply trancension points gain by 10.`,
+                cost: i => Decimal.pow(1.2,i),
+                bulk: i => i.log(1.2),
+
+                effect(i) {
+                    let x = Decimal.pow(10,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                desc: () => `Double reincarnation points gain.`,
+                cost: i => Decimal.pow(1.2,i),
+                bulk: i => i.log(1.2),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },
+        ],
+    },
     es: {
         tab: 1,
         res: ["Mastery Essence",()=>[player,'mastery_essence'],"Mastery Essence"],
         unl: ()=>player.mastery_tier>0,
 
+        auto: () => player.mastery_tier>=40,
         ctn: [
             {
                 desc: () => `Increase luck by ${formatMult(upgradeEffect('es',0)[0])} every level (based on mastery essence).`,
@@ -384,6 +455,12 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => formatPercent(x)+" of RP gained ("+format(tmp.rpGain.mul(x))+")",
+            },{
+                unl: () => player.aTimes>0,
+                oneTime: true,
+
+                desc: () => `Automate AUs, and they no longer spend anything.`,
+                cost: i => E(1e57),
             },
         ],
     },
