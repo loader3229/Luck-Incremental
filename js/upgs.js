@@ -45,6 +45,7 @@ const UPGRADES = {
                     let x = i.div(2)
                     if (hasUpgrade('tp',3)) x = x.mul(2)
 					if (hasUpgrade('rp',7)) x = x.mul(1.5)
+					if (hasUpgrade('ap',6)) x = x.mul(2)
                     return x
                 },
                 effDesc: x => "+"+format(x,1),
@@ -91,6 +92,18 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => "+"+x.format(0)+" later",
+            },{
+                unl: () => player.aTimes>0,
+
+                desc: () => `Boost ascension points gain.`,
+                cost: i => Decimal.pow(10,i).mul("1e3000"),
+                bulk: i => i.div("1e3000").log(10),
+
+                effect(i) {
+                    let x = i.div(100).add(1)
+                    return x
+                },
+                effDesc: x => formatMult(x),
             },
         ],
     },
@@ -293,6 +306,7 @@ const UPGRADES = {
 
                 effect(i) {
                     let b = E(10000)
+                    if (hasUpgrade('ap',6)) b = b.add(upgradeEffect('pp',2))
                     let x = b.pow(i)
 
                     return [b,x]
@@ -331,6 +345,34 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => formatMult(x),
+            },{
+                desc: () => `Double ascension points gain.`,
+                cost: i => Decimal.pow(10,i).mul(1e4),
+                bulk: i => i.div(1e4).log(10),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                unl: () => player.mastery_tier>0,
+
+                desc: () => `Double mastery essence gain.`,
+                cost: i => Decimal.pow(5,i).mul(1e5),
+                bulk: i => i.div(1e5).log(5),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                oneTime: true,
+
+                desc: () => `PU3 is twice as stronger, and it affects AU1's base.`,
+                cost: i => E(1e8),
             },
         ],
     },
@@ -339,7 +381,7 @@ const UPGRADES = {
         res: ["Mastery Essence",()=>[player,'mastery_essence'],"Mastery Essence"],
         unl: ()=>player.mastery_tier>0,
 
-        auto: () => player.mastery_tier>=40,
+        //auto: () => player.mastery_tier>=40,
         ctn: [
             {
                 desc: () => `Increase luck by ${formatMult(upgradeEffect('es',0)[0])} every level (based on mastery essence).`,
@@ -461,6 +503,30 @@ const UPGRADES = {
 
                 desc: () => `Automate AUs, and they no longer spend anything.`,
                 cost: i => E(1e57),
+            },{
+                unl: () => player.aTimes>0,
+                desc: () => `Passively gain AP every second.`,
+                cost: i => Decimal.pow(10,i).mul(1e68),
+                bulk: i => i.div(1e68).log(10),
+				
+                effect(i) {
+                    let x = i
+
+                    return x
+                },
+                effDesc: x => formatPercent(x)+" of AP gained ("+format(tmp.apGain.mul(x))+")",
+            },{
+                unl: () => player.aTimes>0,
+
+                desc: () => `Boost ascension points gain.`,
+                cost: i => Decimal.pow(10,i).mul(1e75),
+                bulk: i => i.div(1e75).log(10),
+
+                effect(i) {
+                    let x = i.add(1)
+                    return x
+                },
+                effDesc: x => formatMult(x),
             },
         ],
     },

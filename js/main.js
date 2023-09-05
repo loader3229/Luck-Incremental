@@ -90,6 +90,8 @@ const MAIN = {
             if (r.lt(0)) return E(0)
             r = r.div(40)
             let x = r.add(1).mul(player.rp.log10().div(600).pow(2).max(1))
+			
+			x = x.mul(upgradeEffect('pp',7)).mul(upgradeEffect('ap',4)).mul(upgradeEffect('es',13))
 
             return x.floor()
         },
@@ -143,7 +145,7 @@ const MAIN = {
             return {luck: x, gen: y}
         },
         essGain() {
-            let x = tmp.mTierEff.gen.mul(upgradeEffect('pp',4)).mul(upgradeEffect('tp',7)).mul(upgradeEffect('es',7))
+            let x = tmp.mTierEff.gen.mul(upgradeEffect('pp',4)).mul(upgradeEffect('tp',7)).mul(upgradeEffect('es',7)).mul(upgradeEffect('ap',5))
 
             return x
         },
