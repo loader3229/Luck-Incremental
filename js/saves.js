@@ -174,7 +174,7 @@ function exporty() {
     window.URL = window.URL || window.webkitURL;
     let a = document.createElement("a")
     a.href = window.URL.createObjectURL(file)
-    a.download = "Test Save - "+new Date().toGMTString()+".txt"
+    a.download = "Luck Incremental Loader's Mod Save - "+new Date().toGMTString()+".txt"
     a.click()
 }
 
