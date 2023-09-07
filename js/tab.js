@@ -4,6 +4,7 @@ const TABS = {
         let u = 1
 
         if (player.rTimes>0) u++
+        if (hasUpgrade('es',14)) u++
 
         return u
     },

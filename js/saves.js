@@ -91,8 +91,12 @@ function getPlayerData() {
 
         mastery_tier: 0,
         mastery_essence: E(0),
+		
+		chall: [],
+		currentChall: -1,
     }
     for (let id in UPGRADES) s.upgrade[id] = new Array(UPGRADES[id].ctn.length).fill(E(0))
+    for (let id in CHALLENGES) s.chall[id] = E(0)
     return s
 }
 

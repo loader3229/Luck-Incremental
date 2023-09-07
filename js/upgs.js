@@ -9,8 +9,8 @@ const UPGRADES = {
         ctn: [
             {
                 desc: () => `Increase luck by ${formatMult(upgradeEffect('pp',0)[0])} every level.`,
-                cost: i => Decimal.pow(3,i),
-                bulk: i => i.log(3),
+                cost: i => Decimal.pow(3,i.scale(10000,2,0)),
+                bulk: i => i.log(3).scale(10000,2,0,true),
 
                 effect(i) {
                     i = i.mul(upgradeEffect('pp',3))
@@ -29,7 +29,7 @@ const UPGRADES = {
                 effect(i) {
                     i = i.mul(upgradeEffect('pp',3))
 
-                    let x = Decimal.pow(1.25,i.root(hasUpgrade('pp',5)?1.8:2));
+                    let x = Decimal.pow(1.25,i.root(1+(hasUpgrade('pp',5)?0.8:1)/(player.chall[0].add(1).log10().div(90).add(1).toNumber())));
 
                     return x
                 },
@@ -46,6 +46,7 @@ const UPGRADES = {
                     if (hasUpgrade('tp',3)) x = x.mul(2)
 					if (hasUpgrade('rp',7)) x = x.mul(1.5)
 					if (hasUpgrade('ap',6)) x = x.mul(2)
+					if (hasUpgrade('es',15)) x = x.mul(upgradeEffect('es',15))
                     return x
                 },
                 effDesc: x => "+"+format(x,1),
@@ -390,6 +391,7 @@ const UPGRADES = {
 
                 effect(i) {
                     let b = player.mastery_essence.add(10).log10().mul(10)
+                    if (hasUpgrade('es',15)) b = b.mul(upgradeEffect('pp',2).mul(upgradeEffect('es',15)).add(1))
                     let x = b.pow(i)
 
                     return [b,x]
@@ -518,12 +520,30 @@ const UPGRADES = {
             },{
                 unl: () => player.aTimes>0,
 
-                desc: () => `Boost ascension points gain.`,
+                desc: () => `Boost ascension points gain based on Mastery Tier.`,
                 cost: i => Decimal.pow(10,i).mul(1e75),
                 bulk: i => i.div(1e75).log(10),
 
                 effect(i) {
-                    let x = i.add(1)
+                    let x = i.mul(player.mastery_tier**2/800).add(1)
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                unl: () => player.aTimes>0,
+                oneTime: true,
+
+                desc: () => `Unlock Challenges.`,
+                cost: i => E(1e84),
+            },{
+                unl: () => player.aTimes>0,
+
+                desc: () => `Boost PU3 based on Mastery Tier, and make PU3 affects Mastery Essence Upgrade 1 at an increased rate.`,
+                cost: i => Decimal.pow(10,i).mul(1e86),
+                bulk: i => i.div(1e86).log(10),
+
+                effect(i) {
+                    let x = i.mul(player.mastery_tier**2/800).add(1)
                     return x
                 },
                 effDesc: x => formatMult(x),

@@ -20,6 +20,7 @@
     <script src="js/format.js"></script>
     <script src="js/temp.js"></script>
     <script src="js/calc.js"></script>
+    <script src="js/chall.js"></script>
 
     <script src="js/upgs.js"></script>
     <script src="js/luck.js"></script>
@@ -50,6 +51,15 @@
             <button class="pres_btn" id="mastery_btn" onclick="MAIN.mastery.reset()">???</button>
             <div id="mastery_tier">Your Mastery Tier is <h3>0</h3>, which boosts luck by <h3>^1.00</h3> and generates <h3>0.00</h3> Mastery Essence every second.</div>
             <div class="upgrades_div" id="es_upgrades_table"></div><br>
+        </div><div id="tab_div2">
+			Entering a challenge will force a Mastery reset.<br>
+			<span id="unlockChall"></span><br>
+			<span id="currentChall"></span><br>
+            <div class="upgrades_div" id="challenges_table">
+			<button class="pres_btn" onclick="exitChall()">Exit Challenge</button>
+			<div id="challenges">
+			</div>
+			</div><br>
         </div>
 
         <div style="height: 200px;"></div>
@@ -69,7 +79,7 @@
             </div>
         </div>
         <div id="tabs"></div>
-        <div id="version">Luck Incremental Loader's Mod version 1.1 - 6 Sep 2023</div>
+        <div id="version">Luck Incremental Loader's Mod version 1.2 - 7 Sep 2023</div>
     </div>
 </body>
 </html>

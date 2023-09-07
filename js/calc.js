@@ -2,7 +2,7 @@ function calc(dt) {
     player.time += dt
     player.roll_time += dt
 
-    if (player.roll_time >= tmp.rollInt.toNumber()) {
+    if (player.roll_time >= tmp.rollInt.toNumber() || player.currentChall == 0) {
         roll()
     }
 
@@ -22,5 +22,8 @@ function calc(dt) {
     player.mastery_essence = player.mastery_essence.add(tmp.essGain.mul(dt))
 
 	if (hasUpgrade('tp',6)||hasUpgrade('rp',5)) player.max_rarity = player.max_rarity.max(LUCK.update())
+	
+	
+	if (player.currentChall != -1) player.chall[player.currentChall] = player.chall[player.currentChall].max(player.max_rarity)
     //roll()
 }

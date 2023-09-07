@@ -39,6 +39,8 @@ const MAIN = {
             r = r.add(1).root(2)
             let x = Decimal.pow(1.1,r).mul(r.add(1)).mul(player.pp.div(1e8).max(1).root(2))
             
+			if(player.pp.gte("1e5000"))x = Decimal.pow(1.1,r).mul(r.add(1)).mul(Decimal.pow(10,player.pp.log10().scale(5000,1.0002,1,true).sub(8).div(2)));
+			
             x = x.mul(upgradeEffect('rp',2)).mul(upgradeEffect('ap',2)).mul(upgradeEffect('es',3)[1])
 
             return x.floor()
@@ -65,6 +67,8 @@ const MAIN = {
             r = r.add(1).root(2)
             let x = Decimal.pow(1.1,r).mul(r.add(1)).mul(player.tp.div(1e9).max(1).root(3))
 
+			if(player.tp.gte("1e5000"))x = Decimal.pow(1.1,r).mul(r.add(1)).mul(Decimal.pow(10,player.tp.log10().scale(5000,1.0002,1,true).sub(9).div(3)));
+				
             x = x.mul(upgradeEffect('ap',3)).mul(upgradeEffect('es',4)[1])
 
             return x.floor()
@@ -125,14 +129,14 @@ const MAIN = {
         reset() {
             if (player.max_rarity.gte(tmp.mTierReq)) {
                 player.mastery_tier++
-				resetUpgrades('ap', hasUpgrade('es',2)?[]:[])
+				
 				
                 this.doReset()
             }
         },
         doReset() {
             player.ap = E(0)
-
+            resetUpgrades('ap', hasUpgrade('es',2)?[]:[])
             MAIN.asce.doReset()
         },
         effect() {
