@@ -15,7 +15,7 @@ body {
 	overflow-x: hidden;
     overflow-y: scroll;
 	font-size: 16px;
-	margin: 0px 0px 0px 60px;
+	margin: 0;
 	user-select: none;
 }
 
@@ -113,7 +113,7 @@ button:not(.locked):hover {
     margin: 5px;
     width: calc(25% - 10px);
     min-width: 250px;
-    height: 140px;
+    height: 70px;
 
     background-color: #282828;
 }
@@ -123,12 +123,12 @@ button:not(.locked):hover {
     flex-grow: 1;
 }
 
-#luck_list > div:first-child::before {
+#luck_list > div:nth-child(2)::before {
     position: absolute;
     top: 0px;
     left: 50%;
     transform: translateX(-50%);
-    content: "[Your Best Rarity]";
+    content: "[Best]";
 }
 
 #bottom_div > button {
@@ -179,7 +179,7 @@ button:not(.locked):hover {
     position: fixed;
     top: 50%;
     height: 100%;
-    left: 0px;
+    right: 0px;
     transform: translateY(-50%);
 
     display: flex;
@@ -196,4 +196,68 @@ button:not(.locked):hover {
 
     font-size: 24px;
     font-weight: bold;
+}
+
+.randomizer {
+	position: relative;
+	margin: 5px;
+    background-color: #222;
+	width: 150px;
+	height: 150px
+}
+
+.randomizer > * {
+	position: absolute;
+	left: 0;
+	width: 150px;
+}
+
+.randomizer > .lvl {
+	top: 75px;
+	transform: translateY(-50%)
+}
+
+.randomizer > .attr {
+	bottom: 0;
+	font-size: 8px
+}
+
+#disclaimer {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+
+	background: radial-gradient(black, transparent, black, black), linear-gradient(maroon, black);
+	background-size: 100% 100%, 100% 10%;
+	animation: disclaimer linear 10s infinite
+}
+
+#disclaimer > b {
+	position: absolute;
+	font-size: 75vmin;
+	color: black;
+	left: 25%;
+	bottom: -25%
+}
+
+#disclaimer > div {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%)
+}
+
+#disclaimer > div > h2 {
+	color: red
+}
+
+@keyframes disclaimer {
+	0% {
+		background-position: 0 0, 0 0
+	}
+	100% {
+		background-position: 0 0, 0 100%
+	}
 }

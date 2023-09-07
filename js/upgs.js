@@ -1,6 +1,6 @@
 const UPGRADES = {
     pp: {
-        tab: 0,
+        tab: 1,
         res: ["PP",()=>[player,'pp'],"Prestige Points (PP)"],
         unl: ()=>player.pTimes>0,
 
@@ -108,7 +108,7 @@ const UPGRADES = {
         ],
     },
     tp: {
-        tab: 0,
+        tab: 1,
         res: ["TP",()=>[player,'tp'],"Transcension Points (TP)"],
         unl: ()=>player.tTimes>0,
 
@@ -208,7 +208,7 @@ const UPGRADES = {
         ],
     },
     rp: {
-        tab: 0,
+        tab: 1,
         res: ["RP",()=>[player,'rp'],"Reincarnation Points (RP)"],
         unl: ()=>player.rTimes>0,
 
@@ -292,7 +292,7 @@ const UPGRADES = {
         ],
     },
     ap: {
-        tab: 0,
+        tab: 1,
         res: ["AP",()=>[player,'ap'],"Ascension Points (AP)"],
         unl: ()=>player.aTimes>0,
 
@@ -377,7 +377,7 @@ const UPGRADES = {
         ],
     },
     es: {
-        tab: 1,
+        tab: 2,
         res: ["Mastery Essence",()=>[player,'mastery_essence'],"Mastery Essence"],
         unl: ()=>player.mastery_tier>0,
 

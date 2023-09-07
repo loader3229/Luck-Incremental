@@ -2,7 +2,7 @@ function E(x){return new Decimal(x)};
 
 const EINF = Decimal.dInf
 const FPS = 30
-const SAVE_ID = 'luck_incremental_save'
+const SAVE_ID = 'Perilous-Luck'
 
 Math.lerp = function (value1, value2, amount) {
 	amount = amount < 0 ? 0 : amount;
@@ -93,6 +93,7 @@ function getPlayerData() {
         mastery_essence: E(0),
     }
     for (let id in UPGRADES) s.upgrade[id] = new Array(UPGRADES[id].ctn.length).fill(E(0))
+	s = Object.assign(s, NGM.save)
     return s
 }
 
@@ -174,7 +175,7 @@ function exporty() {
     window.URL = window.URL || window.webkitURL;
     let a = document.createElement("a")
     a.href = window.URL.createObjectURL(file)
-    a.download = "Luck Incremental Loader's Mod Save - "+new Date().toGMTString()+".txt"
+    a.download = "Perilous Luck - "+new Date().toGMTString()+".txt"
     a.click()
 }
 

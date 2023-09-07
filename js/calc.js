@@ -2,9 +2,8 @@ function calc(dt) {
     player.time += dt
     player.roll_time += dt
 
-    if (player.roll_time >= tmp.rollInt.toNumber()) {
-        roll()
-    }
+    if (player.auto_roll) roll()
+	else player.roll_time = Math.min(player.roll_time, tmp.rollInt.toNumber())
 
     for (let i in UPGRADES) {
         let a = UPGRADES[i].auto
@@ -22,5 +21,4 @@ function calc(dt) {
     player.mastery_essence = player.mastery_essence.add(tmp.essGain.mul(dt))
 
 	if (hasUpgrade('tp',6)||hasUpgrade('rp',5)) player.max_rarity = player.max_rarity.max(LUCK.update())
-    //roll()
 }

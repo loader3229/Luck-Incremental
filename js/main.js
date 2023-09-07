@@ -28,8 +28,13 @@ const MAIN = {
             }
         },
         doReset() {
+            player.randomizers = []
+            player.rarity_progress = E(0)
             player.max_rarity = E(0)
             player.roll_time = 0
+
+            NGM.aura_ch = "green"
+            NGM.temp_reload = 1
         },
     },
     trans: {
@@ -153,7 +158,7 @@ const MAIN = {
 }
 
 el.update.main = ()=>{
-    if (tab == 0) {
+    if (tab == 1) {
         tmp.el.pres_btn.setClasses({locked: tmp.ppGain.lt(1), pres_btn: true})
 
         tmp.el.pres_btn.setHTML(`
@@ -184,8 +189,7 @@ el.update.main = ()=>{
         (Require ${getRarityName(24000).bold()})<br>
         Ascend for ${tmp.apGain.format(0).bold()} Ascension Points
         `)
-    }
-    else if (tab == 1) {
+    } else if (tab == 2) {
         tmp.el.mastery_btn.setClasses({locked: player.max_rarity.lt(tmp.mTierReq), pres_btn: true})
 
         tmp.el.mastery_btn.setHTML(`
@@ -203,8 +207,7 @@ el.update.main = ()=>{
     }
 
     // Luck Multiplier
-
-    tmp.el.luck_mult.setHTML("Your luck multiplier: "+formatMult(tmp.luckMult))
+    tmp.el.luck_mult.setHTML(formatMult(tmp.luckMult)+" luck")
 }
 
 tmp_update.push(()=>{
