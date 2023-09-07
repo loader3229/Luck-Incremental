@@ -4,13 +4,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="Luck Incremental made by MrRedShark77" />
+    <meta name="description" content="NG- Mod on RedShark's Luck Incremental" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://mrredshark77.github.io/Luck-Incremental/" />
-    <meta property="og:title" content="Luck Incremental" />
-    <meta property="og:description" content="Luck Incremental made by MrRedShark77." />
-    <meta property="og:image" content="https://mrredshark77.github.io/Luck-Incremental//icon.png" />
+    <meta property="og:url" content="https://aarextiaokhiao.github.io/Perilous-Luck/" />
+    <meta property="og:title" content="Perilous Luck" />
+    <meta property="og:description" content="NG- Mod on RedShark's Luck Incremental" />
+    <meta property="og:image" content="ttps://aarextiaokhiao.github.io/Perilous-Luck/icon.png" />
 
     <link rel="icon" href="icon.png">
 
@@ -21,6 +21,7 @@
     <script src="js/temp.js"></script>
     <script src="js/calc.js"></script>
 
+    <script src="js/ng_minus.js"></script>
     <script src="js/upgs.js"></script>
     <script src="js/luck.js"></script>
 
@@ -29,42 +30,95 @@
 
     <link rel="stylesheet" href="style.css">
 
-    <title>Luck Incremental</title>
+    <title>Perilous Luck</title>
 </head>
 <body onload="loadGame()">
     <input id="copy" style="position: absolute; top: 0; left: 0; user-select: all; visibility: hidden;">
     <div id="app" style="display: none;">
         <div id="rolled_div"></div>
-        <div id="luck_mult">Your luck multiplier: ???</div>
 
         <div id="tab_div0">
+            <div class="table_center" id="randomizers"></div>
+            <button onclick="roll()" id="roll_btn"></button>
+            <button onclick="player.auto_roll = !player.auto_roll" id="auto_roll_btn"></button>
+			<br>
+
+			<div class="table_center" id="auras"></div>
+			Click a Randomizer to equip. Click again to unequip.<br><br>
+
+			<div id='aura_green'>
+				<h3 style='color: #0d0'>Green - Rise</h3><br>
+				This prevents a Randomizer being changed to lower rarities.
+				<h4>Combos</h4>
+				<span id="combo"></span>
+			</div>
+			<div id='aura_yellow'>
+				<h3 style='color: #dc0'>Yellow - Lock</h3><br>
+				This locks a Randomizer, making it persists on rolling.
+				<h4>Attributes</h4>
+				Attributes on locked Randomizers give boosts.<br><br>
+				<span id="attr"></span>
+			</div>
+			<div id='aura_blue'>
+				<h3 style='color: #05d'>Blue - Merge</h3><br>
+				2 blue-aura Randomizers with same rarities are merged.
+			</div>
+			<div id='aura_red'>
+				<h3 style='color: #d00'>Red - Gamble</h3><br>
+				Winning increases rarities up to maximum.<br>
+				<button onclick="AURA.red.gamble()">Gamble!</button><br>
+				<span id="win_chance"></span><br>
+				<h3 id="gamble_status"></h3>
+			</div>
+        </div><div id="tab_div1">
             <button class="pres_btn" id="pres_btn" onclick="MAIN.prestige.reset()">???</button>
             <div class="upgrades_div" id="pp_upgrades_table"></div><br>
             <button class="pres_btn" id="tran_btn" onclick="MAIN.trans.reset()">???</button>
             <div class="upgrades_div" id="tp_upgrades_table"></div><br>
             <button class="pres_btn" id="rein_btn" onclick="MAIN.rein.reset()">???</button>
             <div class="upgrades_div" id="rp_upgrades_table"></div><br>
-        </div><div id="tab_div1">
+            <button class="pres_btn" id="asce_btn" onclick="MAIN.asce.reset()">???</button>
+            <div class="upgrades_div" id="ap_upgrades_table"></div><br>
+        </div><div id="tab_div2">
             <button class="pres_btn" id="mastery_btn" onclick="MAIN.mastery.reset()">???</button>
             <div id="mastery_tier">Your Mastery Tier is <h3>0</h3>, which boosts luck by <h3>^1.00</h3> and generates <h3>0.00</h3> Mastery Essence every second.</div>
             <div class="upgrades_div" id="es_upgrades_table"></div><br>
         </div>
 
         <div style="height: 200px;"></div>
-        <div id="bottom_div" style="position: fixed; bottom: 0px; width: calc(100% - 60px);">
-            <button id="roll_btn" onclick="roll()">Roll</button>
-            <button onclick="show_luck_nav = !show_luck_nav">Show/Hide Rarity List</button>
+        <div id="bottom_div" style="position: fixed; bottom: 0; width: 100%">
             <button onclick="save()">Save</button>
+            <button onclick="exporty()">Export</button>
+            <button onclick="importy()">Import</button>
+            <button onclick="if(confirm('Are you sure to reset?'))wipe(true)">Reset</button>
 
             <div id="luck_list">
+				<div>
+					<span id="luck_mult"></span><br>
+					<span id="luck_progress"></span>/5 to next
+				</div>
                 <div id="luck_ctn0"></div>
                 <div id="luck_ctn1"></div>
                 <div id="luck_ctn2"></div>
-                <div id="luck_ctn3"></div>
             </div>
         </div>
         <div id="tabs"></div>
-        <div id="version">Version v0.2 Patch 1 (14.06.23)</div>
+        <div id="version">
+			Perilous Luck: NG-<br>
+			Built on <a href="https://qq1010903229.github.io/Luck-Incremental/">Loader's NG+</a><br>
+			<a href="https://mrredshark77.github.io/Luck-Incremental/">Original</a>
+		</div>
     </div>
+	<div id="disclaimer">
+		<b>!</b>
+		<div>
+			<h2>WARNING!</h2><br>
+			This game is hard, and not recommended for newcomers!<br>
+			I recommended using the guide in <a href="https://discord.gg/Ekp8FsSwzR">MrRedShark77's Discord</a>.<br><br>
+			Factors: Complexity, Strategic<br>
+			<button onclick="tmp.el.disclaimer.setDisplay(false)">I understand this risk!</button>
+			<button onclick="window.location.replace('http://aarextiaokhiao.github.io')">Deny</button>
+		</div>
+	</div>
 </body>
 </html>

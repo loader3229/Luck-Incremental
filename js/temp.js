@@ -20,6 +20,8 @@ function resetTemp() {
             effect: [],
         }
     }
+	
+	tmp.rollInt=E(1);
 }
 
 function updateTemp() {

@@ -1,6 +1,6 @@
 const UPGRADES = {
     pp: {
-        tab: 0,
+        tab: 1,
         res: ["PP",()=>[player,'pp'],"Prestige Points (PP)"],
         unl: ()=>player.pTimes>0,
 
@@ -23,17 +23,17 @@ const UPGRADES = {
                 effDesc: x => formatMult(x[1]),
             },{
                 desc: () => `Decrease auto-roll interval.`,
-                cost: i => Decimal.pow(5,i).mul(10),
-                bulk: i => i.div(10).log(5),
+                cost: i => Decimal.pow(5,i.scale(1000,1.001,1)).mul(10),
+                bulk: i => i.div(10).log(5).scale(1000,1.001,1,true),
 
                 effect(i) {
                     i = i.mul(upgradeEffect('pp',3))
 
-                    let x = 1-Decimal.pow(0.8,i.root(2)).toNumber()
+                    let x = Decimal.pow(1.25,i.root(hasUpgrade('pp',5)?1.8:2));
 
                     return x
                 },
-                effDesc: x => "-"+format(x),
+                effDesc: x => "/"+format(x),
             },{
                 desc: () => `Increase PU1's base by +0.5 every level.`,
                 cost: i => Decimal.pow(10,i).mul(1e3),
@@ -44,6 +44,8 @@ const UPGRADES = {
 
                     let x = i.div(2)
                     if (hasUpgrade('tp',3)) x = x.mul(2)
+					if (hasUpgrade('rp',7)) x = x.mul(1.5)
+					if (hasUpgrade('ap',6)) x = x.mul(2)
                     return x
                 },
                 effDesc: x => "+"+format(x,1),
@@ -71,11 +73,42 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => formatMult(x),
+            },{
+                unl: () => player.mastery_tier>0,
+
+                oneTime: true,
+
+                desc: () => `PU2 is better.`,
+                cost: i => E("1e555"),
+            },{
+                unl: () => player.mastery_tier>0,
+
+                desc: () => `Post-100σ rarity scaling starts +5 later per level.`,
+                cost: i => Decimal.pow(10,i.pow(3)).mul("1e1450"),
+                bulk: i => i.div("1e1450").log(10).root(3),
+
+                effect(i) {
+                    let x = i.mul(5)
+                    return x
+                },
+                effDesc: x => "+"+x.format(0)+" later",
+            },{
+                unl: () => player.aTimes>0,
+
+                desc: () => `Boost ascension points gain.`,
+                cost: i => Decimal.pow(10,i).mul("1e3000"),
+                bulk: i => i.div("1e3000").log(10),
+
+                effect(i) {
+                    let x = i.div(100).add(1)
+                    return x
+                },
+                effDesc: x => formatMult(x),
             },
         ],
     },
     tp: {
-        tab: 0,
+        tab: 1,
         res: ["TP",()=>[player,'tp'],"Transcension Points (TP)"],
         unl: ()=>player.tTimes>0,
 
@@ -132,8 +165,8 @@ const UPGRADES = {
                 unl: () => player.rTimes>0,
 
                 desc: () => `Post-100σ rarity scaling starts +10 later per level.`,
-                cost: i => Decimal.pow(10,i.pow(1.5)).mul(1e45),
-                bulk: i => i.div(1e45).log(10).root(1.5),
+                cost: i => Decimal.pow(10,i.pow(3)).mul(1e60),
+                bulk: i => i.div(1e60).log(10).root(3),
 
                 effect(i) {
                     i = i.mul(upgradeEffect('tp',5))
@@ -154,13 +187,32 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },{
+                oneTime: true,
+
+                desc: () => `Auto-Update your best rarity based on luck.`,
+                cost: i => E(1e7),
+            },{
+                unl: () => player.mastery_tier>0,
+
+                desc: () => `Double mastery essence gain.`,
+                cost: i => Decimal.pow(1e5,i.pow(2)).mul("1e450"),
+                bulk: i => i.div("1e450").log(1e5).root(2),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+                    return x
+                },
+                effDesc: x => formatMult(x),
             },
         ],
     },
     rp: {
-        tab: 0,
+        tab: 1,
         res: ["RP",()=>[player,'rp'],"Reincarnation Points (RP)"],
         unl: ()=>player.rTimes>0,
+
+        auto: () => hasUpgrade('es',9),
 
         ctn: [
             {
@@ -170,6 +222,7 @@ const UPGRADES = {
 
                 effect(i) {
                     let b = E(200)
+                    if (hasUpgrade('rp',7)) b = b.add(upgradeEffect('pp',2))
                     let x = b.pow(i)
 
                     return [b,x]
@@ -203,18 +256,132 @@ const UPGRADES = {
                 desc: () => `Automate PUs, and they no longer spend anything.`,
                 cost: i => E(1e4),
             },{
+                desc: () => `Passively gain PP every second.`,
+                cost: i => Decimal.pow(3,i.pow(1.25)).mul(1e9),
+                bulk: i => i.div(1e9).log(3).root(1.25),
+				
+                effect(i) {
+                    let x = i.mul(tmp.upgs.es.effect[6]);
+
+                    return x
+                },
+                effDesc: x => formatPercent(x)+" of PP gained ("+format(tmp.ppGain.mul(x))+")",
+            },{
                 oneTime: true,
 
-                desc: () => `Passively gain 100% of PP gained on reset every second.`,
-                cost: i => E(1e9),
+                desc: () => `Auto-Update your best rarity based on luck.`,
+                cost: i => E(1e7),
+            },{
+                desc: () => `Improve randomizer better.`,
+                cost: i => Decimal.pow(10,i).mul(1e65),
+                bulk: i => i.div(1e65).log(10),
+
+                effect(i) {
+
+                    let x = i.add(1).root(2)
+
+                    return x
+                },
+                effDesc: x => "^"+format(x),
+            },{
+                oneTime: true,
+
+                desc: () => `PU3 is 1.5x stronger, and it affects RU1's base.`,
+                cost: i => E(1e139),
+            },
+        ],
+    },
+    ap: {
+        tab: 1,
+        res: ["AP",()=>[player,'ap'],"Ascension Points (AP)"],
+        unl: ()=>player.aTimes>0,
+
+        auto: () => hasUpgrade('es',11),
+
+        ctn: [
+            {
+                desc: () => `Increase luck by ${formatMult(upgradeEffect('ap',0)[0])} every level.`,
+                cost: i => Decimal.pow(1.2,i),
+                bulk: i => i.log(1.2),
+
+                effect(i) {
+                    let b = E(10000)
+                    if (hasUpgrade('ap',6)) b = b.add(upgradeEffect('pp',2))
+                    let x = b.pow(i)
+
+                    return [b,x]
+                },
+                effDesc: x => formatMult(x[1]),
+            },{
+                desc: () => `Multiply prestige points gain by 10,000.`,
+                cost: i => Decimal.pow(1.2,i),
+                bulk: i => i.log(1.2),
+
+                effect(i) {
+                    let x = Decimal.pow(10000,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                desc: () => `Multiply trancension points gain by 10.`,
+                cost: i => Decimal.pow(1.2,i),
+                bulk: i => i.log(1.2),
+
+                effect(i) {
+                    let x = Decimal.pow(10,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                desc: () => `Double reincarnation points gain.`,
+                cost: i => Decimal.pow(1.2,i),
+                bulk: i => i.log(1.2),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                desc: () => `Double ascension points gain.`,
+                cost: i => Decimal.pow(10,i).mul(1e4),
+                bulk: i => i.div(1e4).log(10),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                unl: () => player.mastery_tier>0,
+
+                desc: () => `Double mastery essence gain.`,
+                cost: i => Decimal.pow(5,i).mul(1e5),
+                bulk: i => i.div(1e5).log(5),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                oneTime: true,
+
+                desc: () => `PU3 is twice as stronger, and it affects AU1's base.`,
+                cost: i => E(1e8),
             },
         ],
     },
     es: {
-        tab: 1,
+        tab: 2,
         res: ["Mastery Essence",()=>[player,'mastery_essence'],"Mastery Essence"],
         unl: ()=>player.mastery_tier>0,
 
+        //auto: () => player.mastery_tier>=40,
         ctn: [
             {
                 desc: () => `Increase luck by ${formatMult(upgradeEffect('es',0)[0])} every level (based on mastery essence).`,
@@ -269,6 +436,97 @@ const UPGRADES = {
                     return [b,x]
                 },
                 effDesc: x => formatMult(x[1]),
+            },{
+                desc: () => `Passively gain TP every second.`,
+                cost: i => Decimal.pow(3,i).mul(3e8),
+                bulk: i => i.div(3e8).log(3),
+				
+                effect(i) {
+                    let x = i
+
+                    return x
+                },
+                effDesc: x => formatPercent(x)+" of TP gained ("+format(tmp.tpGain.mul(x))+")",
+            },{
+                desc: () => `Multiply PP passive gain upgrade.`,
+                cost: i => Decimal.pow(3,i).mul(1e11),
+                bulk: i => i.div(1e11).log(3),
+				
+                effect(i) {
+                    let x = i.add(1)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                desc: () => `Double mastery essence gain.`,
+                cost: i => Decimal.pow(10,i).mul(1e13),
+                bulk: i => i.div(1e13).log(10),
+				
+                effect(i) {
+                    let x = E(2).pow(i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                desc: () => `Improve randomizer better.`,
+                cost: i => Decimal.pow(10,i).mul(1e20),
+                bulk: i => i.div(1e20).log(10),
+
+                effect(i) {
+
+                    let x = i.add(1)
+
+                    return x
+                },
+                effDesc: x => "^"+format(x),
+            },{
+                oneTime: true,
+
+                desc: () => `Automate RUs, and they no longer spend anything.`,
+                cost: i => E(1e25),
+            },{
+                desc: () => `Passively gain RP every second.`,
+                cost: i => Decimal.pow(10,i).mul(1e30),
+                bulk: i => i.div(1e30).log(10),
+				
+                effect(i) {
+                    let x = i
+
+                    return x
+                },
+                effDesc: x => formatPercent(x)+" of RP gained ("+format(tmp.rpGain.mul(x))+")",
+            },{
+                unl: () => player.aTimes>0,
+                oneTime: true,
+
+                desc: () => `Automate AUs, and they no longer spend anything.`,
+                cost: i => E(1e57),
+            },{
+                unl: () => player.aTimes>0,
+                desc: () => `Passively gain AP every second.`,
+                cost: i => Decimal.pow(10,i).mul(1e68),
+                bulk: i => i.div(1e68).log(10),
+				
+                effect(i) {
+                    let x = i
+
+                    return x
+                },
+                effDesc: x => formatPercent(x)+" of AP gained ("+format(tmp.apGain.mul(x))+")",
+            },{
+                unl: () => player.aTimes>0,
+
+                desc: () => `Boost ascension points gain.`,
+                cost: i => Decimal.pow(10,i).mul(1e75),
+                bulk: i => i.div(1e75).log(10),
+
+                effect(i) {
+                    let x = i.add(1)
+                    return x
+                },
+                effDesc: x => formatMult(x),
             },
         ],
     },

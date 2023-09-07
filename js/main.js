@@ -15,7 +15,7 @@ const MAIN = {
             if (r.lt(0)) return E(0)
             let x = Decimal.pow(1.1,r).mul(r.add(1))
 
-            x = x.mul(upgradeEffect('tp',1)).mul(upgradeEffect('rp',1)).mul(upgradeEffect('es',1)[1])
+            x = x.mul(upgradeEffect('tp',1)).mul(upgradeEffect('rp',1)).mul(upgradeEffect('ap',1)).mul(upgradeEffect('es',1)[1])
 
             return x.floor()
         },
@@ -28,8 +28,13 @@ const MAIN = {
             }
         },
         doReset() {
+            player.randomizers = []
+            player.rarity_progress = E(0)
             player.max_rarity = E(0)
             player.roll_time = 0
+
+            NGM.aura_ch = "green"
+            NGM.temp_reload = 1
         },
     },
     trans: {
@@ -39,7 +44,7 @@ const MAIN = {
             r = r.add(1).root(2)
             let x = Decimal.pow(1.1,r).mul(r.add(1)).mul(player.pp.div(1e8).max(1).root(2))
             
-            x = x.mul(upgradeEffect('rp',2)).mul(upgradeEffect('es',3)[1])
+            x = x.mul(upgradeEffect('rp',2)).mul(upgradeEffect('ap',2)).mul(upgradeEffect('es',3)[1])
 
             return x.floor()
         },
@@ -53,7 +58,7 @@ const MAIN = {
         },
         doReset() {
             player.pp = E(0)
-            resetUpgrades('pp',hasUpgrade('es',2)?[1]:[])
+            resetUpgrades('pp',hasUpgrade('es',2)?[1,6]:[])
 
             MAIN.prestige.doReset()
         },
@@ -65,7 +70,7 @@ const MAIN = {
             r = r.add(1).root(2)
             let x = Decimal.pow(1.1,r).mul(r.add(1)).mul(player.tp.div(1e9).max(1).root(3))
 
-            x = x.mul(upgradeEffect('es',4)[1])
+            x = x.mul(upgradeEffect('ap',3)).mul(upgradeEffect('es',4)[1])
 
             return x.floor()
         },
@@ -79,20 +84,26 @@ const MAIN = {
         },
         doReset() {
             player.tp = E(0)
-            resetUpgrades('tp')
+            resetUpgrades('tp', hasUpgrade('es',2)?[6]:[])
 
             MAIN.trans.doReset()
         },
     },
-    mastery: {
-        req() {
-            let x = 750 + 600 * player.mastery_tier
+    asce: {
+        gain() {
+            let r = player.max_rarity.sub(24000)
+            if (r.lt(0)) return E(0)
+            r = r.div(40)
+            let x = r.add(1).mul(player.rp.log10().div(600).pow(2).max(1))
+			
+			x = x.mul(upgradeEffect('pp',7)).mul(upgradeEffect('ap',4)).mul(upgradeEffect('es',13))
 
-            return x
+            return x.floor()
         },
         reset() {
-            if (player.max_rarity.gte(tmp.mTierReq)) {
-                player.mastery_tier++
+            if (player.max_rarity.gte(24000)) {
+                player.ap = player.ap.add(tmp.apGain)
+                player.aTimes++
 
                 this.doReset()
             }
@@ -102,6 +113,32 @@ const MAIN = {
             resetUpgrades('rp', hasUpgrade('es',2)?[3,4]:[])
 
             MAIN.rein.doReset()
+        },
+    },
+    mastery: {
+        req() {
+			if(player.mastery_tier==0)return 777;
+				
+            let x = 500 + 600 * player.mastery_tier;
+
+			if(player.mastery_tier>=10)x = 600 * player.mastery_tier + 5 * (player.mastery_tier**2);
+			if(player.mastery_tier>=20)x = 35 * (player.mastery_tier**2);
+			if(player.mastery_tier>=35)x = player.mastery_tier**3;
+			
+            return x
+        },
+        reset() {
+            if (player.max_rarity.gte(tmp.mTierReq)) {
+                player.mastery_tier++
+				resetUpgrades('ap', hasUpgrade('es',2)?[]:[])
+				
+                this.doReset()
+            }
+        },
+        doReset() {
+            player.ap = E(0)
+
+            MAIN.asce.doReset()
         },
         effect() {
             let t = player.mastery_tier
@@ -113,7 +150,7 @@ const MAIN = {
             return {luck: x, gen: y}
         },
         essGain() {
-            let x = tmp.mTierEff.gen.mul(upgradeEffect('pp',4))
+            let x = tmp.mTierEff.gen.mul(upgradeEffect('pp',4)).mul(upgradeEffect('tp',7)).mul(upgradeEffect('es',7)).mul(upgradeEffect('ap',5))
 
             return x
         },
@@ -121,7 +158,7 @@ const MAIN = {
 }
 
 el.update.main = ()=>{
-    if (tab == 0) {
+    if (tab == 1) {
         tmp.el.pres_btn.setClasses({locked: tmp.ppGain.lt(1), pres_btn: true})
 
         tmp.el.pres_btn.setHTML(`
@@ -144,8 +181,15 @@ el.update.main = ()=>{
         (Require ${getRarityName(300).bold()})<br>
         Reincarnate for ${tmp.rpGain.format(0).bold()} Reincarnation Points
         `)
-    }
-    else if (tab == 1) {
+
+        tmp.el.asce_btn.setDisplay(player.rTimes>0)
+        tmp.el.asce_btn.setClasses({locked: tmp.apGain.lt(1), pres_btn: true})
+
+        tmp.el.asce_btn.setHTML(`
+        (Require ${getRarityName(24000).bold()})<br>
+        Ascend for ${tmp.apGain.format(0).bold()} Ascension Points
+        `)
+    } else if (tab == 2) {
         tmp.el.mastery_btn.setClasses({locked: player.max_rarity.lt(tmp.mTierReq), pres_btn: true})
 
         tmp.el.mastery_btn.setHTML(`
@@ -163,14 +207,14 @@ el.update.main = ()=>{
     }
 
     // Luck Multiplier
-
-    tmp.el.luck_mult.setHTML("Your luck multiplier: "+formatMult(tmp.luckMult))
+    tmp.el.luck_mult.setHTML(formatMult(tmp.luckMult)+" luck")
 }
 
 tmp_update.push(()=>{
     tmp.ppGain = MAIN.prestige.gain()
     tmp.tpGain = MAIN.trans.gain()
     tmp.rpGain = MAIN.rein.gain()
+    tmp.apGain = MAIN.asce.gain()
 
     tmp.mTierReq = MAIN.mastery.req()
     tmp.mTierEff = MAIN.mastery.effect()

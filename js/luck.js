@@ -1,113 +1,94 @@
 const LUCK = {
     mult() {
         let x = E(1)
-
-        x = x.mul(upgradeEffect('pp',0)[1]).mul(upgradeEffect('tp',0)[1]).mul(upgradeEffect('rp',0)[1]).mul(upgradeEffect('es',0)[1])
-
+        x = x.mul(tmp.combo.mult).add(attrEff("luck", 0))
+        x = x.mul(upgradeEffect('pp',0)[1]).mul(upgradeEffect('tp',0)[1]).mul(upgradeEffect('rp',0)[1]).mul(upgradeEffect('ap',0)[1]).mul(upgradeEffect('es',0)[1])
         x = x.pow(tmp.mTierEff.luck||1)
-
         return x
     },
     pow() {
         let x = E(1)
-
-        x = x.mul(upgradeEffect('tp',2))
-
+        x = x.mul(upgradeEffect('tp',2)).mul(upgradeEffect('rp',6)).mul(upgradeEffect('es',8))
         return x
     },
-    generate() {
-        let r = Decimal.pow(Math.random(),-1).pow(tmp.luckPow).mul(tmp.luckMult).log(tmp.luckBase).scale(tmp.raritySS,2,0,true).scale(1000,1.001,1,true)
-
-        //r = r.min(player.max_rarity.add(1))
-
-        return r.floor()
+    getRarity(rand) {
+        return E(rand).pow(tmp.luckPow).mul(tmp.luckMult).log(tmp.luckBase).scale(tmp.raritySS,2,0,true).floor()
+    },
+    getChance(rarity) {
+		return Decimal.pow(tmp.luckBase, rarity.scale(tmp.raritySS,2,0)).div(tmp.luckMult).root(tmp.luckPow)
+    },
+    generateChance(step) {
+		let mult = E(1)
+		if (step.gte(1e6)) {
+			mult = step.div(1e6)
+			step = E(1e6)
+		}
+        return E(1).sub(Decimal.pow(Math.random(), step.pow(-1))).pow(-1).mul(mult)
+    },
+    generate(luck = 1) {
+        return this.getRarity(luck)
     },
 }
 
-const RARITY_PREFIX = [
-    ["Common","Uncommon","Rare",'Unique',"Epic","Legendary",'Mythic','Divine','Almighty','Phenomenal','Preeminent','Inlimitable','Exotic','Ethereal','Scarce','Superior','Astronia','Affinity','Noviax','Endre','Abyxtic'],
-    ['',"Kilo","Mega","Giga",'Tera','Peta','Exa','Zetta','Yotta','Xenna','Weka','Vendeka','Uda','Tradaka','Sorta','Rinta','Quexa','Pepta','Ocha','Nena','Minga','Luma','Kema','Jretta','Iqatta','Huitta','Gatextta','Feqesa','Encsenda','Desyta','Ceanata','Bevvgta','Avta'],
-    ['','Meta','Hyper','Ultra','Omni','Mesko','Omega'],
-]
-const RP_LENS = RARITY_PREFIX.map(x=>x.length)
+const RARITY_PREFIX = ["Generic","Common","Uncommon","Rare","Epic","Legendary",'Mythic','Divine','Almighty','Phenomenal','Preeminent','Inlimitable','Exotic','Ethereal','Scarce','Superior','Astronia','Affinity','Noviax','Endre','Abyxtic']
+const RP_LEN = RARITY_PREFIX.length
 
 var show_luck_nav = true
 
 function getRarityName(i) {
-    let h = ''
+	i = E(i)
+	let x = i.div(5).floor(), xx = x.div(RP_LEN).floor()
 
-    i = E(i).floor()
-
-    if (i.lt(9e15)) {
-        i = i.toNumber()
-
-        let a = Math.floor(i / RP_LENS[0])
-    
-        if (a>0) h += a < RP_LENS[1] ? RARITY_PREFIX[1][a]+"-" : 'Arch'+format(a,0).sup()+'-'
-        h += RARITY_PREFIX[0][i%RP_LENS[0]]
-    } else {
-        let m = i.layer
-        if (m>0) h += (m < RP_LENS[2] ? RARITY_PREFIX[2][m] : 'Lode'+format(m,0).sup()) + (m<9e15?"-":"")
-
-        if (m<9e15) {
-            let p = Math.max(i.mag-15.954242509439325), q = Math.floor((p%1)*RP_LENS[0]), a = Math.floor(p)
-        
-            if (a>0) h += a < RP_LENS[1] ? RARITY_PREFIX[1][a]+"-" : 'Arch'+format(a,0).sup()+'-'
-            h += RARITY_PREFIX[0][q%RP_LENS[0]]
-        }
-    }
+    let h = RARITY_PREFIX[x.sub(xx.mul(RP_LEN)).toNumber()]
+	if (xx.gt(0)) h += ` ${format(xx.add(1),0)}`
+	h += `<sup>${["--","-","","+","++"][i.sub(x.mul(5)).toNumber()]}</sup>`
 
     return h+` [${format(i,0)}σ]`
 }
 
 function getRarityChance(i) {
-    let x = Decimal.pow(tmp.luckBase,i.scale(1000,1.001,1).scale(tmp.raritySS,2,0)).div(tmp.luckMult).root(tmp.luckPow)
+    let x = Decimal.pow(tmp.luckBase, i.scale(tmp.raritySS,2,0)).div(tmp.luckMult).root(tmp.luckPow)
 
     return x.max(1)
 }
 
 function roll() {
-    let r = LUCK.generate()
+	if (player.roll_time < tmp.rollInt.toNumber()) return
 
-    player.max_rarity = player.max_rarity.max(r)
+	let times = E(player.roll_time).div(tmp.rollInt).floor().max(1)	
+	if (times.gte(100000)) player.roll_time = 0
+    else player.roll_time -= tmp.rollInt.mul(times).toNumber()
 
-    tmp.el.rolled_div.setHTML(`
-    You rolled:<br>
-    <h1>${getRarityName(r)}</h1>
-    `)
-
-    player.roll_time = 0
+	RANDOMIZERS.roll_all(times)
 }
 
 tmp_update.push(()=>{
-    tmp.raritySS = E(100).add(upgradeEffect('tp',4,0))
+    tmp.raritySS = E(100).add(upgradeEffect('tp',4,0)).add(upgradeEffect('pp',6,0))
 
-    tmp.luckBase = 1.25
-    tmp.rollInt = 1-upgradeEffect('pp',1,0)
+	let exp = 2 //^2 with NG-
+	exp /= attrEff("scale", 1)
+
+    tmp.luckBase = 1.25 ** exp
+    tmp.rollInt = upgradeEffect('pp',1,0).pow(-1).mul(3) //x3 with NG-
+	tmp.rollInt = tmp.rollInt.div(attrEff("roll", 1))
     tmp.luckMult = LUCK.mult()
     tmp.luckPow = LUCK.pow()
 })
 
 el.update.luck = () => {
     let mr = player.max_rarity
-
-    tmp.el.luck_list.setDisplay(show_luck_nav)
-
-    if (show_luck_nav) for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
         let m = mr.add(i)
-
         let lc = tmp.el['luck_ctn'+i]
-
         lc.setDisplay(i == 0 || m.lt(9e15))
-
         if (i > 0 && m.gte(9e15)) continue
 
-        lc.setHTML(
-        `
-        <h4>${getRarityName(m)}</h4> 1 / ${getRarityChance(m).format()}
-        `
-        )
+        lc.setHTML(`
+        <h4>${getRarityName(m)}<br>
+		1 / ${LUCK.getChance(m).format()}</h4>
+        `)
     }
 
-    tmp.el.roll_btn.setHTML("Roll ("+format(Math.max(tmp.rollInt-player.roll_time,0),1)+"s)")
+    tmp.el.roll_btn.setHTML("Roll ("+format(Math.max(tmp.rollInt.toNumber()-player.roll_time,0),1)+"s)")
+    tmp.el.auto_roll_btn.setHTML("Auto: " + (player.auto_roll ? "ON" : "OFF"))
 }
