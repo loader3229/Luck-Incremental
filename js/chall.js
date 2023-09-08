@@ -15,6 +15,16 @@ const CHALLENGES = [
 		unl(){
 			return player.chall[0].gte(50000);
 		},
+	},
+	{
+		name: "No Prestige",
+		desc: "You can't gain any prestige points.",
+		reward(){
+			return "Boost base prestige points based on best rarity in this challenge. Currently: ^"+format(player.chall[2].add(1).log10().div(90).add(1));
+		},
+		unl(){
+			return player.chall[1].gte(50000);
+		},
 	}
 ]
 
@@ -42,6 +52,7 @@ el.setup.chall = function(){
 el.update.chall = function(){
 	tmp.el.unlockChall.setHTML(
 		player.chall[0].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [Stable] to unlock next challenge':
+		player.chall[1].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [Unlucky] to unlock next challenge':
 		'You unlocked all challenges!');
 	tmp.el.currentChall.setHTML(player.currentChall==-1?'You are not in any challenge.':'You are in challenge ['+CHALLENGES[player.currentChall].name+']');
 	

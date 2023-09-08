@@ -54,8 +54,8 @@ const UPGRADES = {
                 unl: () => player.tTimes>0,
 
                 desc: () => `Previous prestige upgrades are +2.5% stronger per level.`,
-                cost: i => Decimal.pow(10,i.pow(2)).mul(1e18),
-                bulk: i => i.div(1e18).log(10).root(2),
+                cost: i => Decimal.pow(10,i.scale(1000,1.001,1).pow(2)).mul(1e18),
+                bulk: i => i.div(1e18).log(10).root(2).scale(1000,1.001,1,true),
 
                 effect(i) {
                     let x = i.mul(0.025).add(1)
@@ -89,6 +89,8 @@ const UPGRADES = {
                 bulk: i => i.div("1e1450").log(10).root(3),
 
                 effect(i) {
+                    if(hasUpgrade('st',5))i = i.mul(upgradeEffect('tp',5))
+					
                     let x = i.mul(5)
                     return x
                 },
@@ -101,6 +103,8 @@ const UPGRADES = {
                 bulk: i => i.div("1e3000").log(10),
 
                 effect(i) {
+                    if(hasUpgrade('st',5))i = i.mul(upgradeEffect('tp',5))
+						
                     let x = i.div(100).add(1)
                     return x
                 },
@@ -222,6 +226,8 @@ const UPGRADES = {
                 bulk: i => i.log(3).root(1.25),
 
                 effect(i) {
+                    i = i.mul(upgradeEffect('ap',7))
+					
                     let b = E(200)
                     if (hasUpgrade('rp',7)) b = b.add(upgradeEffect('pp',2))
                     let x = b.pow(i)
@@ -235,6 +241,8 @@ const UPGRADES = {
                 bulk: i => i.log(3).root(1.25),
 
                 effect(i) {
+                    i = i.mul(upgradeEffect('ap',7))
+					
                     let x = Decimal.pow(10,i)
 
                     return x
@@ -246,6 +254,8 @@ const UPGRADES = {
                 bulk: i => i.log(3).root(1.25),
 
                 effect(i) {
+                    i = i.mul(upgradeEffect('ap',7))
+					
                     let x = Decimal.pow(2,i)
 
                     return x
@@ -262,6 +272,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e9).log(3).root(1.25),
 				
                 effect(i) {
+                    i = i.mul(upgradeEffect('ap',7))
+					
                     let x = i.mul(tmp.upgs.es.effect[6]);
 
                     return x
@@ -278,7 +290,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e65).log(10),
 
                 effect(i) {
-
+                    i = i.mul(upgradeEffect('ap',7))
+					
                     let x = i.add(1).root(2)
 
                     return x
@@ -375,6 +388,17 @@ const UPGRADES = {
                 desc: () => `PU3 is twice as stronger, and it affects AU1's base.`,
                 cost: i => E(1e8),
             },
+            {
+                desc: () => `RP upgrades 1-3,5,7 are stronger.`,
+                cost: i => Decimal.pow(2,i).mul(1e15),
+                bulk: i => i.div(1e15).log(2),
+
+                effect(i) {
+                    let x = i.mul(0.05).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },
         ],
     },
     es: {
@@ -382,7 +406,7 @@ const UPGRADES = {
         res: ["Mastery Essence",()=>[player,'mastery_essence'],"Mastery Essence"],
         unl: ()=>player.mastery_tier>0,
 
-        //auto: () => player.mastery_tier>=40,
+        auto: () => hasUpgrade('st',4),
         ctn: [
             {
                 desc: () => `Increase luck by ${formatMult(upgradeEffect('es',0)[0])} every level (based on mastery essence).`,
@@ -390,6 +414,8 @@ const UPGRADES = {
                 bulk: i => i.div(10).log(2),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('st',0))
+					
                     let b = player.mastery_essence.add(10).log10().mul(10)
                     if (hasUpgrade('es',15)) b = b.mul(upgradeEffect('pp',2).mul(upgradeEffect('es',15)).add(1))
                     let x = b.pow(i)
@@ -403,6 +429,9 @@ const UPGRADES = {
                 bulk: i => i.div(100).log(3),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('st',0))
+					
+					
                     let b = player.pp.add(10).log10()
                     let x = b.pow(i)
 
@@ -420,6 +449,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e4).log(4),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('st',1))
+					
                     let b = player.tp.add(10).log10()
                     let x = b.pow(i)
 
@@ -432,6 +463,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e6).log(5),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('st',1))
+					
                     let b = player.rp.add(10).log10()
                     let x = b.pow(i)
 
@@ -444,6 +477,8 @@ const UPGRADES = {
                 bulk: i => i.div(3e8).log(3),
 				
                 effect(i) {
+					i = i.mul(upgradeEffect('st',1))
+					
                     let x = i
 
                     return x
@@ -455,6 +490,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e11).log(3),
 				
                 effect(i) {
+					i = i.mul(upgradeEffect('st',1))
+					
                     let x = i.add(1)
 
                     return x
@@ -547,6 +584,61 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => formatMult(x),
+            },
+        ],
+    },
+    st: {
+        tab: 1,
+        res: ["Mastery Stones",()=>[player,'mastery_stone'],"Mastery Stones"],
+        unl: ()=>player.mastery_tier>=45,
+
+        //auto: () => player.mastery_tier>=40,
+        ctn: [
+            {
+                desc: () => `First 2 Mastery Essence upgrades are stronger.`,
+                cost: i => Decimal.pow(2,i).mul(10),
+                bulk: i => i.div(10).log(2),
+
+                effect(i) {
+                    let x = i.mul(0.1).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },
+            {
+                desc: () => `Mastery Essence upgrades 4-7 are stronger.`,
+                cost: i => Decimal.pow(2,i).mul(200),
+                bulk: i => i.div(200).log(2),
+
+                effect(i) {
+                    let x = i.mul(0.05).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },{
+                desc: () => `Double mastery essence and mastery stone gain.`,
+                cost: i => Decimal.pow(10,i).mul(1000),
+                bulk: i => i.div(1000).log(10),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                desc: () => `AP formula is better.`,
+                oneTime: true,
+                cost: i => E(15000),
+            },{
+                oneTime: true,
+
+                desc: () => `Automate Mastery Essence Upgrades, and they no longer spend anything.`,
+                cost: i => E(500000),
+            },{
+                oneTime: true,
+
+                desc: () => `TU5 boost PU6 and PU7.`,
+                cost: i => E(1500000),
             },
         ],
     },

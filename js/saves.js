@@ -91,6 +91,7 @@ function getPlayerData() {
 
         mastery_tier: 0,
         mastery_essence: E(0),
+        mastery_stone: E(0),
 		
 		chall: [],
 		currentChall: -1,
