@@ -70,7 +70,7 @@ tmp_update.push(()=>{
 
     tmp.luckBase = 1.25 ** exp
     tmp.rollInt = upgradeEffect('pp',1,0).pow(-1).mul(3) //x3 with NG-
-	tmp.rollInt = tmp.rollInt.div(attrEff("roll", 1))
+	tmp.rollInt = tmp.rollInt.div(attrEff("speed", 1))
     tmp.luckMult = LUCK.mult()
     tmp.luckPow = LUCK.pow()
 })
