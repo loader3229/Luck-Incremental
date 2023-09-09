@@ -94,7 +94,7 @@ const MAIN = {
             if (r.lt(0)) return E(0)
 			if(hasUpgrade('st',3))r = r.pow(2).div(100000)
 			else r = r.div(40)
-            let x = r.add(1).mul(player.rp.log10().div(600).pow(2).max(1))
+            let x = r.add(1).mul(player.rp.add(1).log10().div(600).pow(2).max(1))
 			
 			x = x.mul(upgradeEffect('pp',7)).mul(upgradeEffect('ap',4)).mul(upgradeEffect('es',13))
 
@@ -143,7 +143,7 @@ const MAIN = {
         effect() {
             let t = player.mastery_tier
 
-            let x = Math.pow(t+1,1/3)
+            let x = Math.pow(t*upgradeEffect('st',6,E(1)).toNumber()+1,1/3)
 
             let y = Decimal.pow(10,t-1).mul(t)
 

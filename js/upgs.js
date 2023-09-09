@@ -639,6 +639,16 @@ const UPGRADES = {
 
                 desc: () => `TU5 boost PU6 and PU7.`,
                 cost: i => E(1500000),
+            },{
+                desc: () => `The 1st effect of Mastery Essence is stronger based on Mastery Tier.`,
+                cost: i => Decimal.pow(5,i).mul(5000000),
+                bulk: i => i.div(5000000).log(5),
+
+                effect(i) {
+                    let x = i.mul(player.mastery_tier/100).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
             },
         ],
     },
