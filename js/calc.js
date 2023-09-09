@@ -2,7 +2,7 @@ function calc(dt) {
     player.time += dt
     player.roll_time += dt
 
-    if (player.auto_roll) roll()
+    if (player.auto_roll && player.currentChall != 0) roll()
 	else player.roll_time = Math.min(player.roll_time, tmp.rollInt.toNumber())
 
     for (let i in UPGRADES) {
@@ -20,5 +20,9 @@ function calc(dt) {
 
     player.mastery_essence = player.mastery_essence.add(tmp.essGain.mul(dt))
 
+    player.mastery_stone = player.mastery_stone.add(tmp.stoneGain.mul(dt))
+
 	if (hasUpgrade('tp',6)||hasUpgrade('rp',5)) player.max_rarity = player.max_rarity.max(LUCK.update())
+
+	if (player.currentChall != -1) player.chall[player.currentChall] = player.chall[player.currentChall].max(player.max_rarity)
 }

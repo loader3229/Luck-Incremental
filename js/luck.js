@@ -1,9 +1,12 @@
 const LUCK = {
     mult() {
+		if (player.currentChall == 1)return E(1)
         let x = E(1)
         x = x.mul(tmp.combo.mult).add(attrEff("luck", 0))
         x = x.mul(upgradeEffect('pp',0)[1]).mul(upgradeEffect('tp',0)[1]).mul(upgradeEffect('rp',0)[1]).mul(upgradeEffect('ap',0)[1]).mul(upgradeEffect('es',0)[1])
+
         x = x.pow(tmp.mTierEff.luck||1)
+        x = x.pow(player.chall[1].add(1).log10().div(90).add(1))
         return x
     },
     pow() {
@@ -54,6 +57,7 @@ function getRarityChance(i) {
 
 function roll() {
 	if (player.roll_time < tmp.rollInt.toNumber()) return
+	if (player.currentChall == 0) return
 
 	let times = E(player.roll_time).div(tmp.rollInt).floor().max(1)	
 	if (times.gte(100000)) player.roll_time = 0

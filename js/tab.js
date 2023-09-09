@@ -4,9 +4,10 @@ const TABS = {
         let u = 1
         if (player.pTimes>0||player.max_rarity.gte(10)) u++
         if (player.rTimes>0) u++
+        if (hasUpgrade('es',14)) u++
         return u
     },
-    sym: `-αβγδεζηθικλμνξοπρστυφχψω`,
+    sym: `-αβcγδεζηθικλμνξοπρστυφχψω`,
 }
 
 el.setup.tabs = () => {
