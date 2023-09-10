@@ -12,8 +12,8 @@ const MAIN = {
     prestige: {
         gain() {
             let r = player.max_rarity.sub(15)
-            if (r.lt(0) || player.currentChall == 2) return E(0)
-            let x = Decimal.pow(1.1,r).mul(r.add(1)).pow(player.chall[2].add(1).log10().div(90).add(1))
+            if (r.lt(0) || player.currentChall == 2 || player.currentChall == 3 || player.currentChall == 4) return E(0)
+            let x = Decimal.pow(1.1,r).mul(r.add(1)).pow(player.chall[2].add(1).log10().div(90).add(1).mul(player.chall[3].add(1).log10().div(90).add(1)).mul(player.chall[4].add(1).log10().div(90).add(1)))
 
             x = x.mul(upgradeEffect('tp',1)).mul(upgradeEffect('rp',1)).mul(upgradeEffect('ap',1)).mul(upgradeEffect('es',1)[1])
 
@@ -90,9 +90,9 @@ const MAIN = {
     },
     asce: {
         gain() {
-            let r = player.max_rarity.sub(hasUpgrade('st',3)?10000:24000)
+            let r = player.max_rarity.sub(hasUpgrade('st',3)?24000-upgradeEffect('st',3,0):24000)
             if (r.lt(0)) return E(0)
-			if(hasUpgrade('st',3))r = r.pow(2).div(100000)
+			if(hasUpgrade('st',3))r = r.pow(2).mul(player.upgrade.st[3].pow(2)).div(Decimal.pow(0.9,player.upgrade.st[3]).mul(100000).add(1))
 			else r = r.div(40)
             let x = r.add(1).mul(player.rp.add(1).log10().div(600).pow(2).max(1))
 			
@@ -101,7 +101,7 @@ const MAIN = {
             return x.floor()
         },
         reset() {
-            if (player.max_rarity.gte(hasUpgrade('st',3)?10000:24000)) {
+            if (player.max_rarity.gte(hasUpgrade('st',3)?24000-upgradeEffect('st',3,0):24000)) {
                 player.ap = player.ap.add(tmp.apGain)
                 player.aTimes++
 
@@ -192,7 +192,7 @@ el.update.main = ()=>{
         tmp.el.asce_btn.setClasses({locked: tmp.apGain.lt(1), pres_btn: true})
 
         tmp.el.asce_btn.setHTML(`
-        (Require ${getRarityName(hasUpgrade('st',3)?10000:24000).bold()})<br>
+        (Require ${getRarityName(hasUpgrade('st',3)?24000-upgradeEffect('st',3,0):24000).bold()})<br>
         Ascend for ${tmp.apGain.format(0).bold()} Ascension Points
         `)
     }

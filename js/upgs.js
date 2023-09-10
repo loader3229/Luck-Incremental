@@ -29,7 +29,7 @@ const UPGRADES = {
                 effect(i) {
                     i = i.mul(upgradeEffect('pp',3))
 
-                    let x = Decimal.pow(1.25,i.root(1+(hasUpgrade('pp',5)?0.8:1)/(player.chall[0].add(1).log10().div(90).add(1).toNumber())));
+                    let x = Decimal.pow(1.25,i.root(1+(hasUpgrade('pp',5)?0.8:1)/(player.chall[0].add(1).log10().div(90).add(1).mul(player.chall[4].add(1).log10().div(90).add(1)).toNumber())));
 
                     return x
                 },
@@ -627,8 +627,13 @@ const UPGRADES = {
                 effDesc: x => formatMult(x),
             },{
                 desc: () => `AP formula is better.`,
-                oneTime: true,
-                cost: i => E(15000),
+                cost: i => Decimal.pow(1e5,i).mul(15000),
+                bulk: i => i.div(15000).log(1e5),
+                effect(i) {
+					if(i.lt(1))return 0;
+                    return Math.floor(14000+9000*(1-Decimal.pow(0.9,i.sub(1)).toNumber()));
+                },
+                effDesc: x => "-"+format(x)+" to Ascension Requirement",
             },{
                 oneTime: true,
 

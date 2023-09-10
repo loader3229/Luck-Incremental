@@ -3,14 +3,14 @@ const CHALLENGES = [
 		name: "Stable",
 		desc: "You can't roll anything.",
 		reward(){
-			return "Boost PU2 effect based on best rarity in this challenge. Currently: "+format(player.chall[0].add(1).log10().div(90).add(1));
+			return "Boost PU2 effect based on best rarity in this challenge. Currently: "+format(player.chall[0].add(1).log10().div(90).add(1).mul(player.chall[4].add(1).log10().div(90).add(1)));
 		},
 	},
 	{
 		name: "Unlucky",
 		desc: "Your luck multiplier is 1.",
 		reward(){
-			return "Boost luck multiplier based on best rarity in this challenge. Currently: ^"+format(player.chall[1].add(1).log10().div(90).add(1));
+			return "Boost luck multiplier based on best rarity in this challenge. Currently: ^"+format(player.chall[1].add(1).log10().div(90).add(1).mul(player.chall[3].add(1).log10().div(90).add(1)));
 		},
 		unl(){
 			return player.chall[0].gte(50000);
@@ -20,10 +20,30 @@ const CHALLENGES = [
 		name: "No Prestige",
 		desc: "You can't gain any prestige points.",
 		reward(){
-			return "Boost base prestige points based on best rarity in this challenge. Currently: ^"+format(player.chall[2].add(1).log10().div(90).add(1));
+			return "Boost base prestige points based on best rarity in this challenge. Currently: ^"+format(player.chall[2].add(1).log10().div(90).add(1).mul(player.chall[3].add(1).log10().div(90).add(1)).mul(player.chall[4].add(1).log10().div(90).add(1)));
 		},
 		unl(){
 			return player.chall[1].gte(50000);
+		},
+	},
+	{
+		name: "No Prestige + Unlucky",
+		desc: "You can't gain any prestige points. Your luck multiplier is 1.",
+		reward(){
+			return "Boost rewards of subchallenges.";
+		},
+		unl(){
+			return player.chall[2].gte(50000);
+		},
+	},
+	{
+		name: "No Prestige + Stable",
+		desc: "You can't gain any prestige points. You can't roll anything.",
+		reward(){
+			return "Boost rewards of subchallenges.";
+		},
+		unl(){
+			return player.chall[3].gte(50000);
 		},
 	}
 ]
@@ -53,6 +73,8 @@ el.update.chall = function(){
 	tmp.el.unlockChall.setHTML(
 		player.chall[0].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [Stable] to unlock next challenge':
 		player.chall[1].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [Unlucky] to unlock next challenge':
+		player.chall[2].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige] to unlock next challenge':
+		player.chall[3].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige + Unlucky] to unlock next challenge':
 		'You unlocked all challenges!');
 	tmp.el.currentChall.setHTML(player.currentChall==-1?'You are not in any challenge.':'You are in challenge ['+CHALLENGES[player.currentChall].name+']');
 	
