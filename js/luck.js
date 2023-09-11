@@ -134,6 +134,7 @@ function roll() {
 
 tmp_update.push(()=>{
     tmp.raritySS = E(100).add(upgradeEffect('tp',4,0)).add(upgradeEffect('pp',6,0))
+	if(player.mastery_tier>=80)tmp.raritySS = tmp.raritySS.add(player.mastery_tier**2/160)
 
     tmp.luckBase = 1.25
     tmp.rollInt = upgradeEffect('pp',1).pow(-1)

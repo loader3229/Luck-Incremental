@@ -45,6 +45,16 @@ const CHALLENGES = [
 		unl(){
 			return player.chall[3].gte(50000);
 		},
+	},
+	{
+		name: "No Prestige & Transcend",
+		desc: "You can't gain any prestige & transcension points.",
+		reward(){
+			return "Boost base transcension points based on best rarity in this challenge. Currently: ^"+format(player.chall[5].add(1).log10().div(90).add(1));
+		},
+		unl(){
+			return player.chall[4].gte(50000);
+		},
 	}
 ]
 
@@ -75,6 +85,7 @@ el.update.chall = function(){
 		player.chall[1].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [Unlucky] to unlock next challenge':
 		player.chall[2].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige] to unlock next challenge':
 		player.chall[3].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige + Unlucky] to unlock next challenge':
+		player.chall[4].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige + Stable] to unlock next challenge':
 		'You unlocked all challenges!');
 	tmp.el.currentChall.setHTML(player.currentChall==-1?'You are not in any challenge.':'You are in challenge ['+CHALLENGES[player.currentChall].name+']');
 	

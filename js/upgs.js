@@ -319,6 +319,8 @@ const UPGRADES = {
                 bulk: i => i.log(1.2),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('st',9))
+					
                     let b = E(10000)
                     if (hasUpgrade('ap',6)) b = b.add(upgradeEffect('pp',2))
                     let x = b.pow(i)
@@ -332,6 +334,8 @@ const UPGRADES = {
                 bulk: i => i.log(1.2),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('st',9))
+					
                     let x = Decimal.pow(10000,i)
 
                     return x
@@ -343,6 +347,8 @@ const UPGRADES = {
                 bulk: i => i.log(1.2),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('st',9))
+					
                     let x = Decimal.pow(10,i)
 
                     return x
@@ -354,6 +360,8 @@ const UPGRADES = {
                 bulk: i => i.log(1.2),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('st',9))
+					
                     let x = Decimal.pow(2,i)
 
                     return x
@@ -531,6 +539,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e30).log(10),
 				
                 effect(i) {
+					i = i.mul(upgradeEffect('st',7))
+					
                     let x = i
 
                     return x
@@ -549,6 +559,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e68).log(10),
 				
                 effect(i) {
+					i = i.mul(upgradeEffect('st',7))
+					
                     let x = i
 
                     return x
@@ -562,6 +574,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e75).log(10),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('st',7))
+					
                     let x = i.mul(player.mastery_tier**2/800).add(1)
                     return x
                 },
@@ -580,6 +594,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e86).log(10),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('st',7))
+					
                     let x = i.mul(player.mastery_tier**2/800).add(1)
                     return x
                 },
@@ -627,11 +643,11 @@ const UPGRADES = {
                 effDesc: x => formatMult(x),
             },{
                 desc: () => `AP formula is better.`,
-                cost: i => Decimal.pow(1e5,i).mul(15000),
-                bulk: i => i.div(15000).log(1e5),
+                cost: i => Decimal.pow(1e5,i.root(2)).mul(15000),
+                bulk: i => i.div(15000).log(1e5).pow(2),
                 effect(i) {
 					if(i.lt(1))return 0;
-                    return Math.floor(14000+9000*(1-Decimal.pow(0.9,i.sub(1)).toNumber()));
+                    return Math.ceil(14000+9000*(1-Decimal.pow(0.9,i.sub(1)).toNumber()));
                 },
                 effDesc: x => "-"+format(x)+" to Ascension Requirement",
             },{
@@ -651,6 +667,39 @@ const UPGRADES = {
 
                 effect(i) {
                     let x = i.mul(player.mastery_tier/100).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },
+            {
+                desc: () => `Mastery Essence upgrades 11,13,14,16 are stronger.`,
+                cost: i => Decimal.pow(2,i).mul(1e11),
+                bulk: i => i.div(1e11).log(2),
+
+                effect(i) {
+                    let x = i.mul(0.5).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },{
+                oneTime: true,
+				
+                desc: () => `TP formula is better.`,
+                cost: i => Decimal.pow(1e5,i.root(2)).mul(4e12),
+                //bulk: i => i.div(4e12).log(1e5).pow(2),
+                effect(i) {
+					if(i.lt(1))return 0;
+                    return Math.ceil(50+20*(1-Decimal.pow(0.9,i.sub(1)).toNumber()));
+                },
+                effDesc: x => "-"+format(x)+" to Transcension Requirement",
+            },
+            {
+                desc: () => `Ascension Upgrades 1-4 are stronger.`,
+                cost: i => Decimal.pow(2,i).mul(3e13),
+                bulk: i => i.div(3e13).log(2),
+
+                effect(i) {
+                    let x = i.mul(0.5).add(1)
                     return x
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",
