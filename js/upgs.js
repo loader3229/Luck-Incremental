@@ -29,7 +29,7 @@ const UPGRADES = {
                 effect(i) {
                     i = i.mul(upgradeEffect('pp',3))
 
-                    let x = Decimal.pow(1.25,i.root(1+(hasUpgrade('pp',5)?0.8:1)/(player.chall[0].add(1).log10().div(90).add(1).mul(player.chall[4].add(1).log10().div(90).add(1)).toNumber())));
+                    let x = Decimal.pow(1.25,i.root(1+(hasUpgrade('pp',5)?0.8:1)/(player.chall[0].add(1).log10().div(90).add(1).mul(player.chall[4].add(1).log10().div(90).add(1)).mul(player.chall[6].add(1).log10().div(90).add(1)).mul(player.chall[9].add(1).log10().div(90).add(1)).toNumber())));
 
                     return x
                 },
@@ -137,8 +137,8 @@ const UPGRADES = {
                 effDesc: x => formatMult(x[1]),
             },{
                 desc: () => `Double prestige points gain.`,
-                cost: i => Decimal.pow(3,i.scale(100,2,0)),
-                bulk: i => i.log(3).scale(100,2,0,true),
+                cost: i => i.eq(0)?E(1):Decimal.pow(3,i.scale(100,hasUpgrade('st',10)?1:2,0)),
+                bulk: i => i.log(3).scale(100,hasUpgrade('st',10)?1:2,0,true),
 
                 effect(i) {
                     i = i.mul(upgradeEffect('tp',5))
@@ -608,7 +608,7 @@ const UPGRADES = {
         res: ["Mastery Stones",()=>[player,'mastery_stone'],"Mastery Stones"],
         unl: ()=>player.mastery_tier>=45,
 
-        //auto: () => player.mastery_tier>=40,
+        auto: () => hasUpgrade('se',3),
         ctn: [
             {
                 desc: () => `First 2 Mastery Essence upgrades are stronger.`,
@@ -682,11 +682,9 @@ const UPGRADES = {
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",
             },{
-                oneTime: true,
-				
                 desc: () => `TP formula is better.`,
-                cost: i => Decimal.pow(1e5,i.root(2)).mul(4e12),
-                //bulk: i => i.div(4e12).log(1e5).pow(2),
+                cost: i => Decimal.pow(2e9,i.root(2)).mul(4e12),
+                bulk: i => i.div(4e12).log(2e9).pow(2),
                 effect(i) {
 					if(i.lt(1))return 0;
                     return Math.ceil(50+20*(1-Decimal.pow(0.9,i.sub(1)).toNumber()));
@@ -703,6 +701,67 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },
+            {
+                oneTime: true,
+
+                desc: () => `Remove Transcension Upgrades 2 cost scaling`,
+                cost: i => E(1e27),
+
+            },{
+				
+                unl: () => player.super_tier>0,
+				
+                desc: () => `Double Super Essence gain.`,
+                cost: i => Decimal.pow(2,i.pow(2)).mul(1e36),
+                bulk: i => i.div(1e36).log(2).root(2),
+                effect(i) {
+					
+                    let x = Decimal.pow(2,i);
+                    return x
+				},
+                effDesc: x => formatMult(x),
+            },
+        ],
+    },
+    se: {
+        tab: 3,
+        res: ["Super Essence",()=>[player,'super_essence'],"Super Essence"],
+        unl: ()=>player.super_tier>=1,
+
+        //auto: () => player.mastery_tier>=40,
+        ctn: [
+			{
+                desc: () => `Double mastery essence and mastery stone gain.`,
+                cost: i => Decimal.pow(4,i).mul(1e7),
+                bulk: i => i.div(1e7).log(4),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                oneTime: true,
+
+                desc: () => `Automatically Mastery Tier Up (resets nothing)`,
+                cost: i => E(1e9),
+            },
+			{
+                desc: () => `Boost Luck Multiplier.`,
+                cost: i => Decimal.pow(2,i).mul(1e11),
+                bulk: i => i.div(1e11).log(2),
+
+                effect(i) {
+                    let x = i.div(10).add(1)
+                    return x
+                },
+                effDesc: x => "^"+format(x),
+            },{
+                oneTime: true,
+
+                desc: () => `Automate Mastery Stone Upgrades, and they no longer spend anything.`,
+                cost: i => E(1e13),
             },
         ],
     },

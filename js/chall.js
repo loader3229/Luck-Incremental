@@ -3,14 +3,14 @@ const CHALLENGES = [
 		name: "Stable",
 		desc: "You can't roll anything.",
 		reward(){
-			return "Boost PU2 effect based on best rarity in this challenge. Currently: "+format(player.chall[0].add(1).log10().div(90).add(1).mul(player.chall[4].add(1).log10().div(90).add(1)));
+			return "Boost PU2 effect based on best rarity in this challenge. Currently: "+format(player.chall[0].add(1).log10().div(90).add(1).mul(player.chall[4].add(1).log10().div(90).add(1)).mul(player.chall[6].add(1).log10().div(90).add(1)).mul(player.chall[9].add(1).log10().div(90).add(1)));
 		},
 	},
 	{
 		name: "Unlucky",
 		desc: "Your luck multiplier is 1.",
 		reward(){
-			return "Boost luck multiplier based on best rarity in this challenge. Currently: ^"+format(player.chall[1].add(1).log10().div(90).add(1).mul(player.chall[3].add(1).log10().div(90).add(1)));
+			return "Boost luck multiplier based on best rarity in this challenge. Currently: ^"+format(player.chall[1].add(1).log10().div(90).add(1).mul(player.chall[3].add(1).log10().div(90).add(1)).mul(player.chall[7].add(1).log10().div(90).add(1)));
 		},
 		unl(){
 			return player.chall[0].gte(50000);
@@ -50,17 +50,67 @@ const CHALLENGES = [
 		name: "No Prestige & Transcend",
 		desc: "You can't gain any prestige & transcension points.",
 		reward(){
-			return "Boost base transcension points based on best rarity in this challenge. Currently: ^"+format(player.chall[5].add(1).log10().div(90).add(1));
+			return "Boost base transcension points based on best rarity in this challenge. Currently: ^"+format(player.chall[5].add(1).log10().div(90).add(1).mul(player.chall[6].add(1).log10().div(90).add(1)).mul(player.chall[7].add(1).log10().div(90).add(1)));
 		},
 		unl(){
 			return player.chall[4].gte(50000);
+		},
+	},
+	{
+		name: "No Prestige & Transcend + Stable",
+		desc: "You can't gain any prestige & transcension points. You can't roll anything.",
+		reward(){
+			return "Boost rewards of subchallenges.";
+		},
+		unl(){
+			return player.chall[5].gte(50000);
+		},
+	},
+	{
+		name: "No Prestige & Transcend + Unlucky",
+		desc: "You can't gain any prestige & transcension points. Your luck multiplier is 1.",
+		reward(){
+			return "Boost rewards of subchallenges.";
+		},
+		unl(){
+			return player.chall[6].gte(50000);
+		},
+	},
+	{
+		name: "No Prestige, Transcend & Reincarnate",
+		desc: "You can't gain any prestige, transcension & reincarnation points.",
+		reward(){
+			return "Boost base reincarnation points based on best rarity in this challenge. Currently: ^"+format(player.chall[8].add(1).log10().div(90).add(1).mul(player.chall[9].add(1).log10().div(90).add(1)));
+		},
+		unl(){
+			return player.chall[7].gte(50000);
+		},
+	},
+	{
+		name: "No Prestige, Transcend & Reincarnate + Stable",
+		desc: "You can't gain any prestige, transcension & reincarnation points. You can't roll anything.",
+		reward(){
+			return "Boost rewards of subchallenges.";
+		},
+		unl(){
+			return player.chall[8].gte(50000);
+		},
+	},
+	{
+		name: "No Alpha",
+		desc: "You can't gain any prestige, transcension, reincarnation & ascension points.",
+		reward(){
+			return "Boost ascension points based on best rarity in this challenge. Currently: "+formatMult(player.chall[10].add(1).log10().add(1));
+		},
+		unl(){
+			return player.chall[9].gte(50000);
 		},
 	}
 ]
 
 
 function startChall(a){
-	MAIN.mastery.doReset();
+	MAIN.mastery.doReset();let el=tmp.el;resetTemp();tmp.el=el;
 	player.currentChall = a;
 }
 
@@ -86,6 +136,11 @@ el.update.chall = function(){
 		player.chall[2].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige] to unlock next challenge':
 		player.chall[3].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige + Unlucky] to unlock next challenge':
 		player.chall[4].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige + Stable] to unlock next challenge':
+		player.chall[5].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige & Transcend] to unlock next challenge':
+		player.chall[6].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige & Transcend + Stable] to unlock next challenge':
+		player.chall[7].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige & Transcend + Unlucky] to unlock next challenge':
+		player.chall[8].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige, Transcend & Reincarnate] to unlock next challenge':
+		player.chall[9].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige, Transcend & Reincarnate + Stable] to unlock next challenge':
 		'You unlocked all challenges!');
 	tmp.el.currentChall.setHTML(player.currentChall==-1?'You are not in any challenge.':'You are in challenge ['+CHALLENGES[player.currentChall].name+']');
 	

@@ -1,11 +1,11 @@
 const LUCK = {
     mult() {
-		if (player.currentChall == 1 || player.currentChall == 3)return E(1)
+		if (player.currentChall == 1 || player.currentChall == 3 || player.currentChall == 7)return E(1)
         let x = E(1)
 
         x = x.mul(upgradeEffect('pp',0)[1]).mul(upgradeEffect('tp',0)[1]).mul(upgradeEffect('rp',0)[1]).mul(upgradeEffect('ap',0)[1]).mul(upgradeEffect('es',0)[1])
 
-        x = x.pow(tmp.mTierEff.luck||1).pow(player.chall[1].add(1).log10().div(90).add(1).mul(player.chall[3].add(1).log10().div(90).add(1)))
+        x = x.pow(tmp.mTierEff.luck||1).pow(player.chall[1].add(1).log10().div(90).add(1).mul(player.chall[3].add(1).log10().div(90).add(1)).mul(player.chall[7].add(1).log10().div(90).add(1))).pow(upgradeEffect('se',2))
 
         return x
     },
@@ -91,7 +91,7 @@ function getRarityChance(i) {
 }
 
 function roll() {
-	if(player.currentChall == 0 || player.currentChall == 4){
+	if(player.currentChall == 0 || player.currentChall == 4 || player.currentChall == 6 || player.currentChall == 9){
 		tmp.el.rolled_div.setHTML(`
 		You can't roll anything. Your best rarity will be updated based on your luck if you have a certain upgrade.<br>
 		<h1>${getRarityName(player.max_rarity)}</h1>
