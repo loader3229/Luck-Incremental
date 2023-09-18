@@ -150,8 +150,8 @@ const UPGRADES = {
                 effDesc: x => formatMult(x),
             },{
                 desc: () => `Improve randomizer better.`,
-                cost: i => Decimal.pow(10,i.pow(2)).mul(1e2),
-                bulk: i => i.div(1e2).log(10).root(2),
+                cost: i => i.eq(0)?E(1e2):Decimal.pow(10,i.pow(1+1/upgradeEffect('se',5,E(1)).toNumber())).mul(1e2),
+                bulk: i => i.div(1e2).log(10).root(1+1/upgradeEffect('se',5,E(1)).toNumber()),
 
                 effect(i) {
                     i = i.mul(upgradeEffect('tp',5))
@@ -616,6 +616,8 @@ const UPGRADES = {
                 bulk: i => i.div(10).log(2),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('se',6))
+					
                     let x = i.mul(0.1).add(1)
                     return x
                 },
@@ -627,6 +629,8 @@ const UPGRADES = {
                 bulk: i => i.div(200).log(2),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('se',6))
+					
                     let x = i.mul(0.05).add(1)
                     return x
                 },
@@ -697,6 +701,8 @@ const UPGRADES = {
                 bulk: i => i.div(3e13).log(2),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('se',6))
+					
                     let x = i.mul(0.5).add(1)
                     return x
                 },
@@ -705,7 +711,7 @@ const UPGRADES = {
             {
                 oneTime: true,
 
-                desc: () => `Remove Transcension Upgrades 2 cost scaling`,
+                desc: () => `Remove Transcension Upgrade 2 cost scaling`,
                 cost: i => E(1e27),
 
             },{
@@ -762,6 +768,35 @@ const UPGRADES = {
 
                 desc: () => `Automate Mastery Stone Upgrades, and they no longer spend anything.`,
                 cost: i => E(1e13),
+            },{
+                oneTime: true,
+
+                desc: () => `Mastery Stone gain and Mastery Tier's delay scaling effect are better.`,
+                cost: i => E(2e22),
+            },
+            {
+                desc: () => `Transcension Upgrade 3 cost scaling is weaker.`,
+                cost: i => Decimal.pow(2,i.scale(5,2,0).pow(2)).mul(1e24),
+                bulk: i => i.div(1e24).log(2).root(2).scale(5,2,0,true),
+                effect(i) {
+                    let x = i.div(4).add(1)
+                    return x
+                },
+            },
+            {
+                desc: () => `Mastery Stone Upgrades 1,2,10 are stronger.`,
+                cost: i => Decimal.pow(2,i.scale(5,2,0)).mul(1e26),
+                bulk: i => i.div(1e26).log(2).scale(5,2,0,true),
+                effect(i) {
+                    let x = i.div(5).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },{
+                oneTime: true,
+
+                desc: () => `Super Tier boost First Mastery Tier effect.`,
+                cost: i => E(1e34),
             },
         ],
     },

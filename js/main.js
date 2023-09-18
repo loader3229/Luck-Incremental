@@ -145,7 +145,7 @@ const MAIN = {
         effect() {
             let t = player.mastery_tier
 
-            let x = Math.pow(t*upgradeEffect('st',6,E(1)).toNumber()+1,1/3)
+            let x = Math.pow(t*upgradeEffect('st',6,E(1)).toNumber()*(hasUpgrade('se',7)?(player.super_tier/10+1):1)+1,1/3)
 
             let y = Decimal.pow(10,t-1).mul(t)
 
@@ -157,15 +157,16 @@ const MAIN = {
             return x
         },
         stoneGain() {
-			if(player.mastery_tier<45)return E(0);
-            let x = E(player.mastery_tier).div(45).pow(25).mul(upgradeEffect('st',2)).mul(upgradeEffect('se',0));
+			if(player.mastery_tier<45 && !hasUpgrade('se',4))return E(0);
+            let x = E(player.mastery_tier).div(hasUpgrade('se',4)?40:45).add(hasUpgrade('se',4)?1:0).pow(25).mul(upgradeEffect('st',2)).mul(upgradeEffect('se',0));
 
             return x
         },
     },
     superT: {
         req() {
-			if(player.super_tier>=8)return 1e100;
+			if(player.super_tier>=20)return 1e100;
+			if(player.super_tier>=8)return player.super_tier**3;
 			
 			return 100+50*player.super_tier;
         },
@@ -244,7 +245,11 @@ el.update.main = ()=>{
             )
         }
 		
-        if (player.mastery_tier>=80) {
+        if (hasUpgrade('se',4)) {
+            tmp.el.mastery_stone.setHTML(
+                `Your Mastery Tier is delaying post-100σ rarity scaling by <h3>${E(player.mastery_tier**2/100).format()}</h3>, and generating <h3>${tmp.stoneGain.format()}</h3> Mastery Stones every second.`
+            )
+        }else if (player.mastery_tier>=80) {
             tmp.el.mastery_stone.setHTML(
                 `Your Mastery Tier is delaying post-100σ rarity scaling by <h3>${E(player.mastery_tier**2/160).format()}</h3>, and generating <h3>${tmp.stoneGain.format()}</h3> Mastery Stones every second.`
             )
