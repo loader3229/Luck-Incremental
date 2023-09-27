@@ -12,7 +12,7 @@ const LUCK = {
     pow() {
         let x = E(1)
 
-        x = x.mul(upgradeEffect('tp',2)).mul(upgradeEffect('rp',6)).mul(upgradeEffect('es',8))
+        x = x.mul(upgradeEffect('tp',2)).mul(upgradeEffect('rp',6)).mul(upgradeEffect('es',8)).mul(upgradeEffect('se',8))
 
         return x
     },

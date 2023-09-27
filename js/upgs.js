@@ -9,8 +9,8 @@ const UPGRADES = {
         ctn: [
             {
                 desc: () => `Increase luck by ${formatMult(upgradeEffect('pp',0)[0])} every level.`,
-                cost: i => Decimal.pow(3,i.scale(10000,2,0)),
-                bulk: i => i.log(3).scale(10000,2,0,true),
+                cost: i => i.eq(0)?E(1):Decimal.pow(3,i.scale(E(10000).mul(upgradeEffect('se',11)),2,0)),
+                bulk: i => i.log(3).scale(E(10000).mul(upgradeEffect('se',11)),2,0,true),
 
                 effect(i) {
                     i = i.mul(upgradeEffect('pp',3))
@@ -29,7 +29,7 @@ const UPGRADES = {
                 effect(i) {
                     i = i.mul(upgradeEffect('pp',3))
 
-                    let x = Decimal.pow(1.25,i.root(1+(hasUpgrade('pp',5)?0.8:1)/(player.chall[0].add(1).log10().div(90).add(1).mul(player.chall[4].add(1).log10().div(90).add(1)).mul(player.chall[6].add(1).log10().div(90).add(1)).mul(player.chall[9].add(1).log10().div(90).add(1)).toNumber())));
+                    let x = Decimal.pow(1.25,i.root(1+(hasUpgrade('pp',5)?0.8:1)/(player.chall[0].add(1).log10().div(90).add(1).mul(player.chall[4].add(1).log10().div(90).add(1)).mul(player.chall[6].add(1).log10().div(90).add(1)).mul(player.chall[9].add(1).log10().div(90).add(1)).toNumber())).div(upgradeEffect('se',8)));
 
                     return x
                 },
@@ -66,8 +66,8 @@ const UPGRADES = {
                 unl: () => player.mastery_tier>0,
 
                 desc: () => `Double mastery essence gain.`,
-                cost: i => Decimal.pow(1e5,i.pow(2)).mul(1e100),
-                bulk: i => i.div(1e100).log(1e5).root(2),
+                cost: i => Decimal.pow(1e5,i.scale(100000,2,0).pow(2)).mul(1e100),
+                bulk: i => i.div(1e100).log(1e5).root(2).scale(100000,2,0,true),
 
                 effect(i) {
                     let x = Decimal.pow(2,i)
@@ -122,8 +122,8 @@ const UPGRADES = {
         ctn: [
             {
                 desc: () => `Increase luck by ${formatMult(upgradeEffect('tp',0)[0])} every level.`,
-                cost: i => Decimal.pow(3,i),
-                bulk: i => i.log(3),
+                cost: i => Decimal.pow(3,i.scale(5e10,2,0)),
+                bulk: i => i.log(3).scale(5e10,2,0,true),
 
                 effect(i) {
                     i = i.mul(upgradeEffect('tp',5))
@@ -184,8 +184,8 @@ const UPGRADES = {
                 unl: () => player.mastery_tier>0,
 
                 desc: () => `Previous transcension upgrades are +2.5% stronger per level.`,
-                cost: i => Decimal.pow(10,i.scale(5,2,0).pow(2)).mul(1e90),
-                bulk: i => i.div(1e90).log(10).root(2).scale(5,2,0,true),
+                cost: i => Decimal.pow(10,i.scale(1000,1.001,1).scale(5,2,0).pow(2)).mul(1e90),
+                bulk: i => i.div(1e90).log(10).root(2).scale(5,2,0,true).scale(1000,1.001,1,true),
 
                 effect(i) {
                     let x = i.mul(0.025).add(1)
@@ -735,7 +735,7 @@ const UPGRADES = {
         res: ["Super Essence",()=>[player,'super_essence'],"Super Essence"],
         unl: ()=>player.super_tier>=1,
 
-        //auto: () => player.mastery_tier>=40,
+        //auto: () => player.super_tier>=111,
         ctn: [
 			{
                 desc: () => `Double mastery essence and mastery stone gain.`,
@@ -759,7 +759,7 @@ const UPGRADES = {
                 bulk: i => i.div(1e11).log(2),
 
                 effect(i) {
-                    let x = i.div(10).add(1)
+                    let x = i.div(10).add(1).softcap(10,3.5,0)
                     return x
                 },
                 effDesc: x => "^"+format(x),
@@ -776,8 +776,8 @@ const UPGRADES = {
             },
             {
                 desc: () => `Transcension Upgrade 3 cost scaling is weaker.`,
-                cost: i => Decimal.pow(2,i.scale(5,2,0).pow(2)).mul(1e24),
-                bulk: i => i.div(1e24).log(2).root(2).scale(5,2,0,true),
+                cost: i => i.eq(0)?E(1e24):Decimal.pow(2,i.scale(E(5).mul(upgradeEffect('se',11)),2,0).pow(2)).mul(1e24),
+                bulk: i => i.div(1e24).log(2).root(2).scale(E(5).mul(upgradeEffect('se',11)),2,0,true),
                 effect(i) {
                     let x = i.div(4).add(1)
                     return x
@@ -793,10 +793,44 @@ const UPGRADES = {
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",
             },{
-                oneTime: true,
-
                 desc: () => `Super Tier boost First Mastery Tier effect.`,
-                cost: i => E(1e34),
+                cost: i => Decimal.pow(400,i).mul(1e34),
+                bulk: i => i.div(1e34).log(400),
+                effect(i) {
+                    let x = i.div(10).mul(player.super_tier).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },{
+                desc: () => `Improve Randomizer, but decrease PU2 effect.`,
+                cost: i => Decimal.pow(10,i).mul(1e36),
+                bulk: i => i.div(1e36).log(10),
+                effect(i) {
+                    let x = i.add(1)
+                    return x
+                },
+                effDesc: x => "^"+format(x),
+            },{
+                oneTime: true,
+                desc: () => `No Alpha challenge effect is better.`,
+                cost: i => E(1e37),
+            },{
+                desc: () => `RP formula is better.`,
+                cost: i => Decimal.pow(2,i).mul(1e41),
+                bulk: i => i.div(1e41).log(2),
+                effect(i) {
+					if(i.lt(1))return 0;
+                    return Math.ceil(100+150*(1-Decimal.pow(0.9,i.sub(1)).toNumber()));
+                },
+                effDesc: x => "-"+format(x)+" to Reincarnate Requirement",
+            },{
+                oneTime: true,
+                desc: () => `PU1 and Super Essence Upgrade 6 cost scaling starts later.`,
+                cost: i => E(5e47),
+                effect(i) {
+                    let x = i.div(2.4).add(1)
+                    return x
+                },
             },
         ],
     },

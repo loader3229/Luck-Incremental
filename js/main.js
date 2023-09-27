@@ -63,9 +63,9 @@ const MAIN = {
     },
     rein: {
         gain() {
-            let r = player.max_rarity.sub(300)
+            let r = player.max_rarity.sub(300-upgradeEffect('se',10,0))
             if (r.lt(0) || player.currentChall >= 8) return E(0)
-            r = r.add(1).root(2)
+            r = r.add(1).root(hasUpgrade('se',10)?1.7:2).mul(player.upgrade.se[10].mul(4).add(1))
             let x = Decimal.pow(1.1,r).mul(r.add(1)).mul(player.tp.div(1e9).max(1).root(3)).pow(player.chall[8].add(1).log10().div(90).add(1)).pow(player.chall[9].add(1).log10().div(90).add(1))
 
 			if(player.tp.gte("1e5000"))x = Decimal.pow(1.1,r).mul(r.add(1)).mul(Decimal.pow(10,player.tp.log10().scale(5000,1.0002,1,true).sub(9).div(3))).pow(player.chall[8].add(1).log10().div(90).add(1)).pow(player.chall[9].add(1).log10().div(90).add(1));
@@ -97,7 +97,7 @@ const MAIN = {
 			else r = r.div(40)
             let x = r.add(1).mul(player.rp.add(1).log10().div(600).pow(2).max(1))
 			
-			x = x.mul(upgradeEffect('pp',7)).mul(upgradeEffect('ap',4)).mul(upgradeEffect('es',13)).mul(player.chall[10].add(1).log10().add(1))
+			x = x.mul(upgradeEffect('pp',7)).mul(upgradeEffect('ap',4)).mul(upgradeEffect('es',13)).mul(hasUpgrade('se',9)?player.chall[10].add(1):player.chall[10].add(1).log10().add(1))
 
             return x.floor()
         },
@@ -145,7 +145,7 @@ const MAIN = {
         effect() {
             let t = player.mastery_tier
 
-            let x = Math.pow(t*upgradeEffect('st',6,E(1)).toNumber()*(hasUpgrade('se',7)?(player.super_tier/10+1):1)+1,1/3)
+            let x = Math.pow(t*upgradeEffect('st',6,E(1)).toNumber()*(upgradeEffect('se',7).toNumber())+1,1/3)
 
             let y = Decimal.pow(10,t-1).mul(t)
 
@@ -165,7 +165,7 @@ const MAIN = {
     },
     superT: {
         req() {
-			if(player.super_tier>=20)return 1e100;
+			//if(player.super_tier>=20)return 1e100;
 			if(player.super_tier>=8)return player.super_tier**3;
 			
 			return 100+50*player.super_tier;
@@ -216,7 +216,7 @@ el.update.main = ()=>{
         tmp.el.rein_btn.setClasses({locked: tmp.rpGain.lt(1), pres_btn: true})
 
         tmp.el.rein_btn.setHTML(`
-        (Require ${getRarityName(300).bold()})<br>
+        (Require ${getRarityName(300-upgradeEffect('se',10,0)).bold()})<br>
         Reincarnate for ${tmp.rpGain.format(0).bold()} Reincarnation Points
         `)
 

@@ -100,7 +100,7 @@ const CHALLENGES = [
 		name: "No Alpha",
 		desc: "You can't gain any prestige, transcension, reincarnation & ascension points.",
 		reward(){
-			return "Boost ascension points based on best rarity in this challenge. Currently: "+formatMult(player.chall[10].add(1).log10().add(1));
+			return "Boost ascension points based on best rarity in this challenge. Currently: "+formatMult(hasUpgrade('se',9)?player.chall[10].add(1):player.chall[10].add(1).log10().add(1));
 		},
 		unl(){
 			return player.chall[9].gte(50000);
