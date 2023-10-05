@@ -93,11 +93,11 @@ const MAIN = {
         gain() {
             let r = player.max_rarity.sub(24000-upgradeEffect('st',3,0))
             if (r.lt(0) || player.currentChall == 10) return E(0)
-			if(hasUpgrade('st',3))r = r.pow(player.upgrade.st[3].min(11).sub(1).pow(2).div(100).add(2)).mul(player.upgrade.st[3].pow(2)).div(Decimal.pow(0.9,player.upgrade.st[3]).mul(100000).add(1))
+			if(hasUpgrade('st',3))r = r.pow(player.upgrade.st[3].min(11).sub(1).pow(2).div(100).add(2).add(hasUpgrade('se',12)?player.upgrade.st[3].div(500).min(12):0)).mul(player.upgrade.st[3].pow(hasUpgrade('se',12)?5:2)).div(Decimal.pow(0.9,player.upgrade.st[3]).mul(100000).add(1))
 			else r = r.div(40)
             let x = r.add(1).mul(player.rp.add(1).log10().div(600).pow(2).max(1))
 			
-			x = x.mul(upgradeEffect('pp',7)).mul(upgradeEffect('ap',4)).mul(upgradeEffect('es',13)).mul(hasUpgrade('se',9)?player.chall[10].add(1):player.chall[10].add(1).log10().add(1))
+			x = x.mul(upgradeEffect('pp',7)).mul(upgradeEffect('ap',4)).mul(upgradeEffect('es',13)).mul(hasUpgrade('se',9)?player.chall[10].add(1).pow(player.upgrade.se[9].log10().add(1)):player.chall[10].add(1).log10().add(1))
 
             return x.floor()
         },
@@ -158,7 +158,7 @@ const MAIN = {
         },
         stoneGain() {
 			if(player.mastery_tier<45 && !hasUpgrade('se',4))return E(0);
-            let x = E(player.mastery_tier).div(hasUpgrade('se',4)?40:45).add(hasUpgrade('se',4)?1:0).pow(25).mul(upgradeEffect('st',2)).mul(upgradeEffect('se',0));
+            let x = E(player.mastery_tier).div(hasUpgrade('se',4)?E(40).div(player.upgrade.se[4].root(2)):45).add(player.upgrade.se[4]).pow(25).mul(upgradeEffect('st',2)).mul(upgradeEffect('se',0));
 
             return x
         },
@@ -188,7 +188,7 @@ const MAIN = {
         },
         seGain() {
 			if(player.super_tier==0)return E(0);
-            let x = E(player.mastery_tier).mul(player.super_tier).pow(Math.log10((player.super_tier+1)**3+2)+2).mul(upgradeEffect('st',11));
+            let x = E(player.mastery_tier).mul(player.super_tier).pow(Math.log10((player.super_tier+1)**3+2)+2).mul(upgradeEffect('st',11)).mul(upgradeEffect('se',14));
 
             return x
         },
@@ -247,7 +247,7 @@ el.update.main = ()=>{
 		
         if (hasUpgrade('se',4)) {
             tmp.el.mastery_stone.setHTML(
-                `Your Mastery Tier is delaying post-100σ rarity scaling by <h3>${E(player.mastery_tier**2/100).format()}</h3>, and generating <h3>${tmp.stoneGain.format()}</h3> Mastery Stones every second.`
+                `Your Mastery Tier is delaying post-100σ rarity scaling by <h3>${E(player.mastery_tier**2/100*player.upgrade.se[4].pow(0.1).toNumber()).format()}</h3>, and generating <h3>${tmp.stoneGain.format()}</h3> Mastery Stones every second.`
             )
         }else if (player.mastery_tier>=80) {
             tmp.el.mastery_stone.setHTML(

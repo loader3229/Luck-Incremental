@@ -320,6 +320,7 @@ const UPGRADES = {
 
                 effect(i) {
 					i = i.mul(upgradeEffect('st',9))
+					i = i.mul(upgradeEffect('se',13))
 					
                     let b = E(10000)
                     if (hasUpgrade('ap',6)) b = b.add(upgradeEffect('pp',2))
@@ -335,6 +336,7 @@ const UPGRADES = {
 
                 effect(i) {
 					i = i.mul(upgradeEffect('st',9))
+					i = i.mul(upgradeEffect('se',13))
 					
                     let x = Decimal.pow(10000,i)
 
@@ -348,6 +350,7 @@ const UPGRADES = {
 
                 effect(i) {
 					i = i.mul(upgradeEffect('st',9))
+					i = i.mul(upgradeEffect('se',13))
 					
                     let x = Decimal.pow(10,i)
 
@@ -361,6 +364,7 @@ const UPGRADES = {
 
                 effect(i) {
 					i = i.mul(upgradeEffect('st',9))
+					i = i.mul(upgradeEffect('se',13))
 					
                     let x = Decimal.pow(2,i)
 
@@ -386,6 +390,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e5).log(5),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('se',13))
+					
                     let x = Decimal.pow(2,i)
                     return x
                 },
@@ -651,7 +657,7 @@ const UPGRADES = {
                 bulk: i => i.div(15000).log(1e5).pow(2),
                 effect(i) {
 					if(i.lt(1))return 0;
-                    return Math.ceil(14000+9000*(1-Decimal.pow(0.9,i.sub(1)).toNumber()));
+                    return Math.ceil(14000+9000*(1-Decimal.pow(0.9,i.sub(1)).toNumber())+(hasUpgrade('se',12)?i.min(900).toNumber():0));
                 },
                 effDesc: x => "-"+format(x)+" to Ascension Requirement",
             },{
@@ -670,6 +676,8 @@ const UPGRADES = {
                 bulk: i => i.div(5000000).log(5),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('se',15))
+					
                     let x = i.mul(player.mastery_tier/100).add(1)
                     return x
                 },
@@ -759,8 +767,9 @@ const UPGRADES = {
                 bulk: i => i.div(1e11).log(2),
 
                 effect(i) {
-                    let x = i.div(10).add(1).softcap(10,3.5,0)
-                    return x
+					if(i.gte(232))return i.mul(2.5).add(1)
+					if(i.gte(188))return i.mul(1.5).add(1).softcap(300,3.5,0).softcap(440,2,0)
+                    return i.div(10).add(1).softcap(10,3.5,0).softcap(52,3,0).softcap(100,i.pow(3).div(1e7),0)
                 },
                 effDesc: x => "^"+format(x),
             },{
@@ -769,10 +778,9 @@ const UPGRADES = {
                 desc: () => `Automate Mastery Stone Upgrades, and they no longer spend anything.`,
                 cost: i => E(1e13),
             },{
-                oneTime: true,
-
                 desc: () => `Mastery Stone gain and Mastery Tier's delay scaling effect are better.`,
-                cost: i => E(2e22),
+                cost: i => Decimal.pow(1e29,i.scale(5,2,0).root(16)).mul(2e22),
+                bulk: i => i.div(2e22).log(1e29).pow(16).scale(5,2,0,true),
             },
             {
                 desc: () => `Transcension Upgrade 3 cost scaling is weaker.`,
@@ -811,9 +819,9 @@ const UPGRADES = {
                 },
                 effDesc: x => "^"+format(x),
             },{
-                oneTime: true,
                 desc: () => `No Alpha challenge effect is better.`,
-                cost: i => E(1e37),
+                cost: i => Decimal.pow(1e15,i.root(2)).mul(1e37),
+                bulk: i => i.div(1e37).log(1e15).pow(2),
             },{
                 desc: () => `RP formula is better.`,
                 cost: i => Decimal.pow(2,i).mul(1e41),
@@ -824,13 +832,46 @@ const UPGRADES = {
                 },
                 effDesc: x => "-"+format(x)+" to Reincarnate Requirement",
             },{
-                oneTime: true,
                 desc: () => `PU1 and Super Essence Upgrade 6 cost scaling starts later.`,
-                cost: i => E(5e47),
+                cost: i => Decimal.pow(50,i).mul(5e47),
+                bulk: i => i.div(5e47).log(50),
                 effect(i) {
                     let x = i.div(2.4).add(1)
                     return x
                 },
+            },{
+                oneTime: true,
+                desc: () => `Mastery Stone Upgrade 4 effect is better.`,
+                cost: i => E(1e50),
+            },{
+                desc: () => `Ascension Upgrades 1-4,6 are stronger.`,
+                cost: i => Decimal.pow(2,i.scale(10,2,0)).mul(1e57),
+                bulk: i => i.div(1e57).log(2).scale(10,2,0,true),
+
+                effect(i) {
+                    let x = i.mul(100).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },{
+                desc: () => `Double Super Essence gain.`,
+                cost: i => Decimal.pow(10,i).mul(1e63),
+                bulk: i => i.div(1e63).log(10),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                desc: () => `Mastery Stone Upgrade 7 effect is better.`,
+                cost: i => Decimal.pow(2,i).mul(5e70),
+                bulk: i => i.div(5e70).log(2),
+                effect(i) {
+                    let x = i.div(5).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
             },
         ],
     },
