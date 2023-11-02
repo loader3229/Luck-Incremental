@@ -21,11 +21,15 @@ function calc(dt) {
 
     if (hasUpgrade('se',1)) player.mastery_tier = player.max_rarity.add(1).pow(1/3).ceil().max(player.mastery_tier).toNumber()
 		
+    if (hasUpgrade('he',2) && player.super_tier >= 8) player.super_tier = E(player.mastery_tier).add(1).pow(1/3).ceil().max(player.super_tier).toNumber()
+		
     player.mastery_essence = player.mastery_essence.add(tmp.essGain.mul(dt))
 
     player.mastery_stone = player.mastery_stone.add(tmp.stoneGain.mul(dt))
 
     player.super_essence = player.super_essence.add(tmp.seGain.mul(dt))
+	
+    player.hyper_essence = player.hyper_essence.add(tmp.heGain.mul(dt))
 	
 	if (hasUpgrade('tp',6)||hasUpgrade('rp',5)) player.max_rarity = player.max_rarity.max(LUCK.update())
 	

@@ -96,6 +96,9 @@ function getPlayerData() {
         super_tier: 0,
         super_essence: E(0),
 		
+        hyper_tier: 0,
+        hyper_essence: E(0),
+		
 		chall: [],
 		currentChall: -1,
     }

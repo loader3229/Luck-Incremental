@@ -188,6 +188,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e90).log(10).root(2).scale(5,2,0,true).scale(1000,1.001,1,true),
 
                 effect(i) {
+                    i = i.mul(upgradeEffect('he',7))
+					
                     let x = i.mul(0.025).add(1)
                     return x
                 },
@@ -431,6 +433,7 @@ const UPGRADES = {
 					i = i.mul(upgradeEffect('st',0))
 					
                     let b = player.mastery_essence.add(10).log10().mul(10)
+					if (hasUpgrade('he',6))b = b.mul(player.mastery_essence.pow(0.001).pow(upgradeEffect('he',6)))
                     if (hasUpgrade('es',15)) b = b.mul(upgradeEffect('pp',2).mul(upgradeEffect('es',15)).add(1))
                     let x = b.pow(i)
 
@@ -602,7 +605,8 @@ const UPGRADES = {
                 effect(i) {
 					i = i.mul(upgradeEffect('st',7))
 					
-                    let x = i.mul(player.mastery_tier**2/800).add(1)
+                    let x = i.mul(new Decimal(player.mastery_tier).pow(2).div(hasUpgrade('st',14)?1:800)).add(1)
+					x = x.pow(upgradeEffect('st',14,E(0)).add(1))
                     return x
                 },
                 effDesc: x => formatMult(x),
@@ -735,6 +739,54 @@ const UPGRADES = {
                     return x
 				},
                 effDesc: x => formatMult(x),
+            },{
+                unl: () => player.hyper_tier>0,
+                desc: () => `Double Ascension Point gain.`,
+                cost: i => Decimal.pow(2,i).mul(1e300),
+                bulk: i => i.div(1e300).log(2),
+                effect(i) {
+					
+                    let x = Decimal.pow(2,i);
+                    return x
+				},
+                effDesc: x => formatMult(x),
+            },{
+                unl: () => player.hyper_tier>0,
+                desc: () => `Increase Mastery Essence's base by +10 every level.`,
+                cost: i => Decimal.pow(10,i).mul("1e340"),
+                bulk: i => i.div("1e340").log(10),
+
+                effect(i) {
+                    let x = i.mul(10)
+                    return x
+                },
+                effDesc: x => "+"+format(x,1),
+            },{
+                unl: () => player.hyper_tier>0,
+                desc: () => `Mastery Essence Upgrade 16 is better.`,
+                cost: i => Decimal.pow(10,i).mul("1e375"),
+                bulk: i => i.div("1e375").log(10),
+
+                effect(i) {
+					if(i.gte(500))return i.pow(3).div(2e6)
+					if(i.gte(200))return i.pow(2).div(4000)
+					if(i.gte(90))return i.div(20).sub(1.5)
+                    return i.div(10).pow(0.5)
+                },
+            },{
+                unl: () => player.hyper_tier>0,
+                desc: () => `Mastery Tier's delay scaling effect is better.`,
+                cost: i => Decimal.pow(10,i).mul("1e420"),
+                bulk: i => i.div("1e420").log(10),
+
+                effect(i) {
+					if(i.gte(375))return i.div(100).pow(1.5).add(1)
+					if(i.gte(300))return i.div(100).pow(i.div(250)).add(1)
+					if(i.gte(100))return i.div(100).pow(1.2).add(1)
+					if(i.gte(17))return i.div(100).add(1)
+                    return i.div(600).pow(0.5).add(1)
+                },
+                effDesc: x => formatMult(x),
             },
         ],
     },
@@ -743,7 +795,7 @@ const UPGRADES = {
         res: ["Super Essence",()=>[player,'super_essence'],"Super Essence"],
         unl: ()=>player.super_tier>=1,
 
-        //auto: () => player.super_tier>=111,
+        auto: () => hasUpgrade('he',4),
         ctn: [
 			{
                 desc: () => `Double mastery essence and mastery stone gain.`,
@@ -767,8 +819,8 @@ const UPGRADES = {
                 bulk: i => i.div(1e11).log(2),
 
                 effect(i) {
-					if(i.gte(232))return i.mul(2.5).add(1)
-					if(i.gte(188))return i.mul(1.5).add(1).softcap(300,3.5,0).softcap(440,2,0)
+					if(i.gte(371))return i.pow(6).div(1e12)
+					if(i.gte(188))return i.mul(1.5).add(1).softcap(300,3.5,0).softcap(440,2,0).softcap(600,0.45,0)
                     return i.div(10).add(1).softcap(10,3.5,0).softcap(52,3,0).softcap(100,i.pow(3).div(1e7),0)
                 },
                 effDesc: x => "^"+format(x),
@@ -779,8 +831,8 @@ const UPGRADES = {
                 cost: i => E(1e13),
             },{
                 desc: () => `Mastery Stone gain and Mastery Tier's delay scaling effect are better.`,
-                cost: i => Decimal.pow(1e29,i.scale(5,2,0).root(16)).mul(2e22),
-                bulk: i => i.div(2e22).log(1e29).pow(16).scale(5,2,0,true),
+                cost: i => Decimal.pow(1e29,i.scale(10000,1.0001,1).scale(5,2,0).root(16)).mul(2e22),
+                bulk: i => i.div(2e22).log(1e29).pow(16).scale(5,2,0,true).scale(10000,1.0001,1,true),
             },
             {
                 desc: () => `Transcension Upgrade 3 cost scaling is weaker.`,
@@ -869,6 +921,77 @@ const UPGRADES = {
                 bulk: i => i.div(5e70).log(2),
                 effect(i) {
                     let x = i.div(5).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },
+        ],
+    },
+    he: {
+        tab: 4,
+        res: ["Hyper Essence",()=>[player,'hyper_essence'],"Hyper Essence"],
+        unl: ()=>player.hyper_tier>=1,
+
+        //auto: () => player.super_tier>=111,
+        ctn: [
+			{
+                desc: () => `Hyper Essence boost Mastery Stone and Super Essence gain.`,
+                cost: i => Decimal.pow(4,i).mul(10),
+                bulk: i => i.div(10).log(4),
+
+                effect(i) {
+                    let x = Decimal.add(1,player.hyper_essence).pow(0.5).sub(1).mul(Decimal.pow(2,i).sub(1)).add(1);
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },{
+                oneTime: true,
+
+                desc: () => `Keep automation upgrades when Super reset.`,
+                cost: i => E(500),
+            },{
+                oneTime: true,
+
+                desc: () => `Automatically Super Tier Up if Super Tier is at least 8 (resets nothing)`,
+                cost: i => E(10000),
+            },{
+                desc: () => `Mastery Stone formula is better.`,
+                cost: i => Decimal.pow(14,i).mul(100000),
+                bulk: i => i.div(100000).log(14),
+				
+                effect(i) {
+                    let x = new Decimal(i);
+                    return x
+                },
+            },{
+                oneTime: true,
+
+                desc: () => `Automate Super Upgrades, and they no longer spend anything.`,
+                cost: i => E(1000000),
+            },{
+                desc: () => `The 1st effect of Mastery Essence is stronger based on Hyper Tier.`,
+                cost: i => Decimal.pow(2,i).mul(1e14),
+                bulk: i => i.div(1e14).log(2),
+
+                effect(i) {
+                    let x = i.mul(player.hyper_tier).div(5).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },{
+                desc: () => `Mastery Essence Upgrade 1 formula is better.`,
+                cost: i => Decimal.pow(2,i).mul(1e15),
+                bulk: i => i.div(1e15).log(2),
+                effect(i) {
+                    let x = i.pow(0.5)
+                    return x
+                },
+            },{
+                desc: () => `TU6 is stronger.`,
+                cost: i => Decimal.pow(2,i.scale(5,2,0)).mul(1e17),
+                bulk: i => i.div(1e17).log(2).scale(5,2,0,true),
+                effect(i) {
+                    let x = i.pow(2).div(10).add(1)
                     return x
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",

@@ -132,10 +132,13 @@ function roll() {
 	if(player.roll_time<0)player.roll_time=0
 }
 
+function mTierSS(){
+	if(hasUpgrade('se',4))return E(player.mastery_tier).pow(2).div(100).mul(player.upgrade.se[4].pow(0.1)).mul(upgradeEffect('st',15));
+	if(player.mastery_tier>=80)return E(player.mastery_tier).pow(2).div(160).mul(upgradeEffect('st',15));
+	return E(0);
+}
 tmp_update.push(()=>{
-    tmp.raritySS = E(100).add(upgradeEffect('tp',4,0)).add(upgradeEffect('pp',6,0))
-	if (hasUpgrade('se',4))tmp.raritySS = tmp.raritySS.add(player.mastery_tier**2/100*player.upgrade.se[4].pow(0.1).toNumber())
-	else if(player.mastery_tier>=80)tmp.raritySS = tmp.raritySS.add(player.mastery_tier**2/160)
+    tmp.raritySS = E(100).add(upgradeEffect('tp',4,0)).add(upgradeEffect('pp',6,0)).add(mTierSS())
 
     tmp.luckBase = 1.25
     tmp.rollInt = upgradeEffect('pp',1).pow(-1)
