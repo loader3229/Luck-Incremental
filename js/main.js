@@ -116,6 +116,26 @@ const MAIN = {
             MAIN.rein.doReset()
         },
     },
+    reb: {
+        gain() {
+			if(!hasUpgrade('he',8))return E(0);
+            let x = player.max_rarity.add(10).log10().mul(player.ap.add(10).log10()).pow(E(20).add(upgradeEffect('reb',2))).div(Decimal.pow(10,Decimal.pow(10,E(2).sub(player.upgrade.reb[2].div(700)))));
+            
+            return x.floor()
+        },
+        reset() {
+            if (hasUpgrade('he',8)) {
+                player.reb = player.reb.add(tmp.rebGain)
+                this.doReset()
+            }
+        },
+        doReset() {
+            player.ap = E(0)
+            resetUpgrades('ap', [])
+
+            MAIN.asce.doReset()
+        },
+    },
     mastery: {
         req() {
 			if(player.super_tier>=1)return player.mastery_tier**3;
@@ -138,9 +158,9 @@ const MAIN = {
             }
         },
         doReset() {
-            player.ap = E(0)
-            resetUpgrades('ap', hasUpgrade('es',2)?[]:[])
-            MAIN.asce.doReset()
+            player.reb = E(0)
+            resetUpgrades('reb', hasUpgrade('es',2)?[]:[])
+            MAIN.reb.doReset()
         },
         effect() {
             let t = player.mastery_tier
@@ -159,6 +179,12 @@ const MAIN = {
         stoneGain() {
 			if(player.mastery_tier<45 && !hasUpgrade('se',4))return E(0);
             let x = E(player.mastery_tier).div(hasUpgrade('se',4)?E(40).div(player.upgrade.se[4].root(2)):45).add(player.upgrade.se[4]).pow(upgradeEffect('he',3).add(25)).mul(upgradeEffect('st',2)).mul(upgradeEffect('se',0)).mul(upgradeEffect('he',0));
+
+            return x
+        },
+        cloverGain() {
+			if(!hasUpgrade('he',9))return E(0);
+            let x = E(player.mastery_tier).div(1e12).pow(5);
 
             return x
         },
@@ -182,8 +208,10 @@ const MAIN = {
             player.mastery_tier = 0
             player.mastery_essence = E(0)
             player.mastery_stone = E(0)
+            player.mastery_clover = E(0)
             resetUpgrades('es', hasUpgrade('he',1)?[2]:[])
             resetUpgrades('st', hasUpgrade('he',1)?[4]:[])
+            resetUpgrades('cl', hasUpgrade('he',1)?[0]:[])
             MAIN.mastery.doReset()
         },
         seGain() {
@@ -254,6 +282,13 @@ el.update.main = ()=>{
         (Require ${getRarityName(24000-upgradeEffect('st',3,0)).bold()})<br>
         Ascend for ${tmp.apGain.format(0).bold()} Ascension Points
         `)
+		
+        tmp.el.reb_btn.setDisplay(hasUpgrade('he',8))
+        tmp.el.reb_btn.setClasses({locked: tmp.rebGain.lt(1), pres_btn: true})
+
+        tmp.el.reb_btn.setHTML(`
+        Rebirth for ${tmp.rebGain.format(0).bold()} Rebirth Points
+        `)
     }
     else if (tab == 1) {
         tmp.el.mastery_btn.setClasses({locked: player.max_rarity.lt(tmp.mTierReq), pres_btn: true})
@@ -265,6 +300,7 @@ el.update.main = ()=>{
 
         tmp.el.mastery_tier.setDisplay(player.mastery_tier>0)
         tmp.el.mastery_stone.setDisplay(player.mastery_tier>0)
+        tmp.el.mastery_clover.setDisplay(hasUpgrade('he',9))
 
         if (player.mastery_tier>0) {
             tmp.el.mastery_tier.setHTML(
@@ -289,6 +325,12 @@ el.update.main = ()=>{
                 `Reach Mastery Tier 45 to gain Mastery Stone.`
             )
 		}
+		
+		if (hasUpgrade('he',9)) {
+            tmp.el.mastery_clover.setHTML(
+                `Your Mastery Tier is generating <h3>${tmp.cloverGain.format()}</h3> Mastery Clovers every second.`
+            )
+        }
     }
     else if (tab == 3) {
         tmp.el.super_btn.setClasses({locked: player.mastery_tier < tmp.sTierReq, pres_btn: true})
@@ -334,12 +376,14 @@ tmp_update.push(()=>{
     tmp.tpGain = MAIN.trans.gain()
     tmp.rpGain = MAIN.rein.gain()
     tmp.apGain = MAIN.asce.gain()
+    tmp.rebGain = MAIN.reb.gain()
 
     tmp.mTierReq = MAIN.mastery.req()
     tmp.mTierEff = MAIN.mastery.effect()
 
     tmp.essGain = MAIN.mastery.essGain()
     tmp.stoneGain = MAIN.mastery.stoneGain()
+    tmp.cloverGain = MAIN.mastery.cloverGain()
 	
     tmp.sTierReq = MAIN.superT.req()
     tmp.seGain = MAIN.superT.seGain()

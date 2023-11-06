@@ -89,9 +89,12 @@ function getPlayerData() {
         ap: E(0),
         aTimes: 0,
 
+        reb: E(0),
+		
         mastery_tier: 0,
         mastery_essence: E(0),
         mastery_stone: E(0),
+        mastery_clover: E(0),
 		
         super_tier: 0,
         super_essence: E(0),

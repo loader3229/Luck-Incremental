@@ -188,7 +188,7 @@ const UPGRADES = {
                 bulk: i => i.div(1e90).log(10).root(2).scale(5,2,0,true).scale(1000,1.001,1,true),
 
                 effect(i) {
-                    i = i.mul(upgradeEffect('he',7))
+                    i = i.mul(upgradeEffect('he',7)).mul(upgradeEffect('reb',3))
 					
                     let x = i.mul(0.025).add(1)
                     return x
@@ -228,7 +228,7 @@ const UPGRADES = {
                 bulk: i => i.log(3).root(1.25),
 
                 effect(i) {
-                    i = i.mul(upgradeEffect('ap',7))
+                    i = i.mul(upgradeEffect('ap',7)).mul(upgradeEffect('reb',0))
 					
                     let b = E(200)
                     if (hasUpgrade('rp',7)) b = b.add(upgradeEffect('pp',2))
@@ -239,11 +239,11 @@ const UPGRADES = {
                 effDesc: x => formatMult(x[1]),
             },{
                 desc: () => `Multiply prestige points gain by 10.`,
-                cost: i => Decimal.pow(3,i.pow(1.25)),
-                bulk: i => i.log(3).root(1.25),
+                cost: i => i.eq(0)?E(1):Decimal.pow(3,i.pow(hasUpgrade('reb',1)?1:1.25)),
+                bulk: i => i.log(3).root(hasUpgrade('reb',1)?1:1.25),
 
                 effect(i) {
-                    i = i.mul(upgradeEffect('ap',7))
+                    i = i.mul(upgradeEffect('ap',7)).mul(upgradeEffect('reb',0))
 					
                     let x = Decimal.pow(10,i)
 
@@ -252,8 +252,8 @@ const UPGRADES = {
                 effDesc: x => formatMult(x),
             },{
                 desc: () => `Double trancension points gain.`,
-                cost: i => Decimal.pow(3,i.pow(1.25)),
-                bulk: i => i.log(3).root(1.25),
+                cost: i => i.eq(0)?E(1):Decimal.pow(3,i.pow(hasUpgrade('reb',1)?1:1.25)),
+                bulk: i => i.log(3).root(hasUpgrade('reb',1)?1:1.25),
 
                 effect(i) {
                     i = i.mul(upgradeEffect('ap',7))
@@ -274,7 +274,7 @@ const UPGRADES = {
                 bulk: i => i.div(1e9).log(3).root(1.25),
 				
                 effect(i) {
-                    i = i.mul(upgradeEffect('ap',7))
+                    i = i.mul(upgradeEffect('ap',7)).mul(upgradeEffect('reb',0))
 					
                     let x = i.mul(tmp.upgs.es.effect[6]);
 
@@ -292,7 +292,7 @@ const UPGRADES = {
                 bulk: i => i.div(1e65).log(10),
 
                 effect(i) {
-                    i = i.mul(upgradeEffect('ap',7))
+                    i = i.mul(upgradeEffect('ap',7)).mul(upgradeEffect('reb',0))
 					
                     let x = i.add(1).root(2)
 
@@ -411,6 +411,51 @@ const UPGRADES = {
 
                 effect(i) {
                     let x = i.mul(0.05).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },
+        ],
+    },
+    reb: {
+        tab: 0,
+        res: ["Rebirth Points",()=>[player,'reb'],"Rebirth Points"],
+        unl: ()=>hasUpgrade('he',8),
+
+        auto: () => hasUpgrade('cl',1),
+        ctn: [
+            {
+                desc: () => `Reincarnation upgrades 1-2,5,7 are stronger.`,
+                cost: i => Decimal.pow(2,i),
+                bulk: i => i.log(2),
+
+                effect(i) {
+                    let x = i.mul(0.1).add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },{
+                oneTime: true,
+                desc: () => `Reincarnation upgrades 2-3 cost scaling is weaker.`,
+                cost: i => E(5e6),
+            },
+            {
+                desc: () => `Rebirth Point gain is better.`,
+                cost: i => Decimal.pow(2,i).mul(1e8),
+                bulk: i => i.div(1e8).log(2),
+
+                effect(i) {
+                    let x = i.sqrt().div(100)
+                    return x
+                },
+            },
+            {
+                desc: () => `TU6 is stronger.`,
+                cost: i => Decimal.pow(10,i).mul(1e45),
+                bulk: i => i.div(1e45).log(10),
+
+                effect(i) {
+                    let x = i.mul(0.2).add(1)
                     return x
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",
@@ -607,6 +652,7 @@ const UPGRADES = {
 					
                     let x = i.mul(new Decimal(player.mastery_tier).pow(2).div(hasUpgrade('st',14)?1:800)).add(1)
 					x = x.pow(upgradeEffect('st',14,E(0)).add(1))
+					x = x.pow(upgradeEffect('cl',2,E(0)).add(1))
                     return x
                 },
                 effDesc: x => formatMult(x),
@@ -757,6 +803,8 @@ const UPGRADES = {
                 bulk: i => i.div("1e340").log(10),
 
                 effect(i) {
+					i = i.mul(upgradeEffect('cl',3))
+					
                     let x = i.mul(10)
                     return x
                 },
@@ -787,6 +835,54 @@ const UPGRADES = {
                     return i.div(600).pow(0.5).add(1)
                 },
                 effDesc: x => formatMult(x),
+            },
+        ],
+    },
+    cl: {
+        tab: 1,
+        res: ["Mastery Clovers",()=>[player,'mastery_clover'],"Mastery Clovers"],
+        unl: ()=>hasUpgrade('he',9),
+
+        auto: () => false,
+        ctn: [
+			{
+                desc: () => `Passively gain Rebirth Points every second.`,
+                cost: i => Decimal.pow(2,i),
+                bulk: i => i.log(2),
+				
+                effect(i) {
+                    let x = i
+
+                    return x
+                },
+                effDesc: x => formatPercent(x)+" of Rebirth Points gained ("+format(tmp.rebGain.mul(x))+")",
+            },{
+                oneTime: true,
+
+                desc: () => `Automate Rebirth Upgrades, and they no longer spend anything.`,
+                cost: i => E(100),
+            },{
+                unl: () => player.hyper_tier>0,
+                desc: () => `Mastery Essence Upgrade 16 is better.`,
+                cost: i => Decimal.pow(2,i).mul(300),
+                bulk: i => i.div(300).log(2),
+
+                effect(i) {
+                    let x = i
+
+                    return x
+                },
+            },
+            {
+                desc: () => `Mastery Stone Upgrade 14 is stronger.`,
+                cost: i => Decimal.pow(2,i).mul(1e8),
+                bulk: i => i.div(1e8).log(2),
+
+                effect(i) {
+                    let x = i.add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
             },
         ],
     },
@@ -995,6 +1091,16 @@ const UPGRADES = {
                     return x
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },{
+                oneTime: true,
+
+                desc: () => `Unlock a new Alpha layer.`,
+                cost: i => E(2e22),
+            },{
+                oneTime: true,
+
+                desc: () => `Unlock Mastery Clover.`,
+                cost: i => E(1e25),
             },
         ],
     },

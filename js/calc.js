@@ -19,6 +19,8 @@ function calc(dt) {
 		
     if (hasUpgrade('es',12)) player.ap = player.ap.add(tmp.apGain.mul(dt).mul(tmp.upgs.es.effect[12]))
 
+    if (hasUpgrade('cl',0)) player.reb = player.reb.add(tmp.rebGain.mul(dt).mul(tmp.upgs.cl.effect[0]))
+		
     if (hasUpgrade('se',1)) player.mastery_tier = player.max_rarity.add(1).pow(1/3).ceil().max(player.mastery_tier).toNumber()
 		
     if (hasUpgrade('he',2) && player.super_tier >= 8) player.super_tier = E(player.mastery_tier).add(1).pow(1/3).ceil().max(player.super_tier).toNumber()
@@ -26,6 +28,8 @@ function calc(dt) {
     player.mastery_essence = player.mastery_essence.add(tmp.essGain.mul(dt))
 
     player.mastery_stone = player.mastery_stone.add(tmp.stoneGain.mul(dt))
+
+    player.mastery_clover = player.mastery_clover.add(tmp.cloverGain.mul(dt))
 
     player.super_essence = player.super_essence.add(tmp.seGain.mul(dt))
 	
