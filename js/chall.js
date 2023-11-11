@@ -105,12 +105,24 @@ const CHALLENGES = [
 		unl(){
 			return player.chall[9].gte(50000);
 		},
+	},
+	{
+		name: "Unmastered",
+		desc: "Mastery Tier do nothing. Entering this challenge will do a Super Reset.",
+		reward(){
+			return "Boost Mastery Tier's delay scaling effect based on best rarity in this challenge. Currently: "+format(player.chall[11].add(1).log10().div(90).add(1));
+		},
+		unl(){
+			return hasUpgrade('he',10);
+		},
 	}
 ]
 
 
 function startChall(a){
-	MAIN.mastery.doReset();let el=tmp.el;resetTemp();tmp.el=el;
+	MAIN.mastery.doReset();
+	if(a==11)MAIN.superT.doReset();
+	let el=tmp.el;resetTemp();tmp.el=el;
 	player.currentChall = a;
 }
 
@@ -141,7 +153,7 @@ el.update.chall = function(){
 		player.chall[7].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige & Transcend + Unlucky] to unlock next challenge':
 		player.chall[8].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige, Transcend & Reincarnate] to unlock next challenge':
 		player.chall[9].lt(50000)?'Reach '+getRarityName(E(50000)).bold()+' in [No Prestige, Transcend & Reincarnate + Stable] to unlock next challenge':
-		'You unlocked all challenges!');
+		'');
 	tmp.el.currentChall.setHTML(player.currentChall==-1?'You are not in any challenge.':'You are in challenge ['+CHALLENGES[player.currentChall].name+']');
 	
     let us = CHALLENGES

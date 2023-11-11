@@ -2,7 +2,7 @@ function calc(dt) {
     player.time += dt
     player.roll_time += dt
 
-    if (player.roll_time >= tmp.rollInt.toNumber() || player.currentChall == 0) {
+    if (player.roll_time >= tmp.rollInt.toNumber() || player.currentChall == 0 || player.currentChall == 4 || player.currentChall == 6 || player.currentChall == 9) {
         roll()
     }
 
@@ -22,6 +22,8 @@ function calc(dt) {
     if (hasUpgrade('cl',0)) player.reb = player.reb.add(tmp.rebGain.mul(dt).mul(tmp.upgs.cl.effect[0]))
 		
     if (hasUpgrade('se',1)) player.mastery_tier = player.max_rarity.add(1).pow(1/3).ceil().max(player.mastery_tier).toNumber()
+		
+    if (hasUpgrade('he',2)) player.super_tier = E(player.super_tier).max(player.upgrade.he[2]).toNumber()
 		
     if (hasUpgrade('he',2) && player.super_tier >= 8) player.super_tier = E(player.mastery_tier).add(1).pow(1/3).ceil().max(player.super_tier).toNumber()
 		

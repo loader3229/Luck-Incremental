@@ -460,6 +460,30 @@ const UPGRADES = {
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",
             },
+            {
+                desc: () => `Double Rebirth Point gain.`,
+                cost: i => Decimal.pow(10,i).mul(1e55),
+                bulk: i => i.div(1e55).log(10),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },
+			{
+                desc: () => `Improve randomizer better.`,
+                cost: i => Decimal.pow(2,i).mul(1e75),
+                bulk: i => i.div(1e75).log(2),
+
+                effect(i) {
+                    let x = i.pow(2).div(1000).add(1)
+
+                    return x
+                },
+                effDesc: x => "^"+format(x),
+            },
         ],
     },
     es: {
@@ -726,7 +750,7 @@ const UPGRADES = {
                 bulk: i => i.div(5000000).log(5),
 
                 effect(i) {
-					i = i.mul(upgradeEffect('se',15))
+					i = i.mul(upgradeEffect('se',15)).mul(upgradeEffect('cl',5))
 					
                     let x = i.mul(player.mastery_tier/100).add(1)
                     return x
@@ -828,6 +852,9 @@ const UPGRADES = {
                 bulk: i => i.div("1e420").log(10),
 
                 effect(i) {
+					if(i.gte(1600))return i.pow(0.64).add(1)
+					if(i.gte(1024))return i.pow(i.sqrt().div(62.5)).add(1)
+					if(i.gte(1000))return i.pow(i.div(2000)).add(1)
 					if(i.gte(375))return i.div(100).pow(1.5).add(1)
 					if(i.gte(300))return i.div(100).pow(i.div(250)).add(1)
 					if(i.gte(100))return i.div(100).pow(1.2).add(1)
@@ -880,6 +907,29 @@ const UPGRADES = {
 
                 effect(i) {
                     let x = i.add(1)
+                    return x
+                },
+                effDesc: x => formatPercent(x.sub(1))+" stronger",
+            },
+            {
+                desc: () => `Double Mastery Clover gain.`,
+                cost: i => Decimal.pow(10,i).mul(1e11),
+                bulk: i => i.div(1e11).log(10),
+
+                effect(i) {
+                    let x = Decimal.pow(2,i)
+
+                    return x
+                },
+                effDesc: x => formatMult(x),
+            },
+            {
+                desc: () => `Mastery Stone Upgrade 7 is stronger.`,
+                cost: i => Decimal.pow(2,i).mul(1e13),
+                bulk: i => i.div(1e13).log(2),
+
+                effect(i) {
+                    let x = i.pow(2).div(50).add(1)
                     return x
                 },
                 effDesc: x => formatPercent(x.sub(1))+" stronger",
@@ -1046,10 +1096,9 @@ const UPGRADES = {
                 desc: () => `Keep automation upgrades when Super reset.`,
                 cost: i => E(500),
             },{
-                oneTime: true,
-
-                desc: () => `Automatically Super Tier Up if Super Tier is at least 8 (resets nothing)`,
-                cost: i => E(10000),
+                desc: () => `Automatically Super Tier Up if Super Tier is at least 8 (resets nothing). Every level of this upgrade increase initial Super Tier by 1.`,
+                cost: i => Decimal.pow(100,i).mul(10000),
+                bulk: i => i.div(10000).log(100),
             },{
                 desc: () => `Mastery Stone formula is better.`,
                 cost: i => Decimal.pow(14,i).mul(100000),
@@ -1101,6 +1150,11 @@ const UPGRADES = {
 
                 desc: () => `Unlock Mastery Clover.`,
                 cost: i => E(1e25),
+            },{
+                oneTime: true,
+
+                desc: () => `Unlock a new challenge.`,
+                cost: i => E(1e30),
             },
         ],
     },

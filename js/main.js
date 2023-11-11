@@ -12,7 +12,7 @@ const MAIN = {
     prestige: {
         gain() {
             let r = player.max_rarity.sub(15)
-            if (r.lt(0) || player.currentChall >= 2) return E(0)
+            if (r.lt(0) || (player.currentChall >= 2 && player.currentChall <= 10)) return E(0)
             let x = Decimal.pow(1.1,r).mul(r.add(1)).pow(player.chall[2].add(1).log10().div(90).add(1).mul(player.chall[3].add(1).log10().div(90).add(1)).mul(player.chall[4].add(1).log10().div(90).add(1)))
 
             x = x.mul(upgradeEffect('tp',1)).mul(upgradeEffect('rp',1)).mul(upgradeEffect('ap',1)).mul(upgradeEffect('es',1)[1])
@@ -35,7 +35,7 @@ const MAIN = {
     trans: {
         gain() {
             let r = player.max_rarity.sub(100-upgradeEffect('st',8,0))
-            if (r.lt(0) || player.currentChall >= 5) return E(0)
+            if (r.lt(0) || (player.currentChall >= 5 && player.currentChall <= 10)) return E(0)
             r = r.add(1).root(hasUpgrade('st',8)?1.5:2).mul(player.upgrade.st[8].mul(3).add(1))
 			
             let x = Decimal.pow(1.1,r).mul(r.add(1)).mul(player.pp.div(1e8).max(1).root(2)).pow(player.chall[5].add(1).log10().div(90).add(1).mul(player.chall[6].add(1).log10().div(90).add(1)).mul(player.chall[7].add(1).log10().div(90).add(1)))
@@ -64,7 +64,7 @@ const MAIN = {
     rein: {
         gain() {
             let r = player.max_rarity.sub(300-upgradeEffect('se',10,0))
-            if (r.lt(0) || player.currentChall >= 8) return E(0)
+            if (r.lt(0) || (player.currentChall >= 8 && player.currentChall <= 10)) return E(0)
             r = r.add(1).root(hasUpgrade('se',10)?1.7:2).mul(player.upgrade.se[10].mul(4).add(1))
             let x = Decimal.pow(1.1,r).mul(r.add(1)).mul(player.tp.div(1e9).max(1).root(3)).pow(player.chall[8].add(1).log10().div(90).add(1)).pow(player.chall[9].add(1).log10().div(90).add(1))
 
@@ -119,7 +119,7 @@ const MAIN = {
     reb: {
         gain() {
 			if(!hasUpgrade('he',8))return E(0);
-            let x = player.max_rarity.add(10).log10().mul(player.ap.add(10).log10()).pow(E(20).add(upgradeEffect('reb',2))).div(Decimal.pow(10,Decimal.pow(10,E(2).sub(player.upgrade.reb[2].div(700)))));
+            let x = player.max_rarity.add(10).log10().mul(player.ap.add(10).log10()).pow(E(20).add(upgradeEffect('reb',2))).div(Decimal.pow(10,Decimal.pow(10,E(2).sub(player.upgrade.reb[2].div(700))))).mul(upgradeEffect('reb',4));
             
             return x.floor()
         },
@@ -169,14 +169,17 @@ const MAIN = {
 
             let y = Decimal.pow(upgradeEffect('st',13).add(10),t-1).mul(t)
 
+			if(player.currentChall == 11)x=1,y=E(0);
             return {luck: x, gen: y}
         },
         essGain() {
+			if(player.currentChall == 11)return E(0);
             let x = tmp.mTierEff.gen.mul(upgradeEffect('pp',4)).mul(upgradeEffect('tp',7)).mul(upgradeEffect('es',7)).mul(upgradeEffect('ap',5)).mul(upgradeEffect('st',2)).mul(upgradeEffect('se',0))
 
             return x
         },
         stoneGain() {
+			if(player.currentChall == 11)return E(0);
 			if(player.mastery_tier<45 && !hasUpgrade('se',4))return E(0);
             let x = E(player.mastery_tier).div(hasUpgrade('se',4)?E(40).div(player.upgrade.se[4].root(2)):45).add(player.upgrade.se[4]).pow(upgradeEffect('he',3).add(25)).mul(upgradeEffect('st',2)).mul(upgradeEffect('se',0)).mul(upgradeEffect('he',0));
 
@@ -184,7 +187,8 @@ const MAIN = {
         },
         cloverGain() {
 			if(!hasUpgrade('he',9))return E(0);
-            let x = E(player.mastery_tier).div(1e12).pow(5);
+			if(player.currentChall == 11)return E(0);
+            let x = E(player.mastery_tier).div(1e12).pow(5).mul(upgradeEffect('cl',4));
 
             return x
         },
@@ -336,7 +340,7 @@ el.update.main = ()=>{
         tmp.el.super_btn.setClasses({locked: player.mastery_tier < tmp.sTierReq, pres_btn: true})
 
         tmp.el.super_btn.setHTML(`
-        (Require Mastery Tier ${tmp.sTierReq})<br>
+        (Require Mastery Tier ${tmp.sTierReq>1e10?BigInt(player.super_tier)**3n:tmp.sTierReq})<br>
         Evolve Super Tier to <b>${format(player.super_tier+1,0)}</b>
         `)
 
@@ -352,7 +356,7 @@ el.update.main = ()=>{
         tmp.el.hyper_btn.setClasses({locked: player.super_tier < tmp.hTierReq, pres_btn: true})
 
         tmp.el.hyper_btn.setHTML(`
-        (Require Super Tier ${tmp.hTierReq})<br>
+        (Require Super Tier ${tmp.hTierReq>1e10?BigInt(player.hyper_tier)**3n:tmp.hTierReq})<br>
         Evolve Hyper Tier to <b>${format(player.hyper_tier+1,0)}</b>
         `)
 
