@@ -12,8 +12,8 @@ const MAIN = {
     prestige: {
         gain() {
             let r = player.max_rarity.sub(15)
-            if (r.lt(0)) return E(0)
-            let x = Decimal.pow(1.1,r).mul(r.add(1))
+            if (r.lt(0) || player.currentChall == 2) return E(0)
+            let x = Decimal.pow(1.1,r).mul(r.add(1)).pow(player.chall[2].add(1).log10().div(90).add(1))
 
             x = x.mul(upgradeEffect('tp',1)).mul(upgradeEffect('rp',1)).mul(upgradeEffect('ap',1)).mul(upgradeEffect('es',1)[1])
 
@@ -44,6 +44,8 @@ const MAIN = {
             r = r.add(1).root(2)
             let x = Decimal.pow(1.1,r).mul(r.add(1)).mul(player.pp.div(1e8).max(1).root(2))
             
+			if(player.pp.gte("1e5000"))x = Decimal.pow(1.1,r).mul(r.add(1)).mul(Decimal.pow(10,player.pp.log10().scale(5000,1.0002,1,true).sub(8).div(2)));
+			
             x = x.mul(upgradeEffect('rp',2)).mul(upgradeEffect('ap',2)).mul(upgradeEffect('es',3)[1])
 
             return x.floor()
@@ -58,7 +60,7 @@ const MAIN = {
         },
         doReset() {
             player.pp = E(0)
-            resetUpgrades('pp',hasUpgrade('es',2)?[1,6]:[])
+            resetUpgrades('pp',hasUpgrade('es',2)?[1]:[])
 
             MAIN.prestige.doReset()
         },
@@ -70,6 +72,8 @@ const MAIN = {
             r = r.add(1).root(2)
             let x = Decimal.pow(1.1,r).mul(r.add(1)).mul(player.tp.div(1e9).max(1).root(3))
 
+			if(player.tp.gte("1e5000"))x = Decimal.pow(1.1,r).mul(r.add(1)).mul(Decimal.pow(10,player.tp.log10().scale(5000,1.0002,1,true).sub(9).div(3)));
+				
             x = x.mul(upgradeEffect('ap',3)).mul(upgradeEffect('es',4)[1])
 
             return x.floor()
@@ -91,17 +95,18 @@ const MAIN = {
     },
     asce: {
         gain() {
-            let r = player.max_rarity.sub(24000)
+            let r = player.max_rarity.sub(hasUpgrade('st',3)?10000:24000)
             if (r.lt(0)) return E(0)
-            r = r.div(40)
-            let x = r.add(1).mul(player.rp.log10().div(600).pow(2).max(1))
+			if(hasUpgrade('st',3))r = r.pow(2).div(100000)
+			else r = r.div(40)
+            let x = r.add(1).mul(player.rp.add(1).log10().div(600).pow(2).max(1))
 			
 			x = x.mul(upgradeEffect('pp',7)).mul(upgradeEffect('ap',4)).mul(upgradeEffect('es',13))
 
             return x.floor()
         },
         reset() {
-            if (player.max_rarity.gte(24000)) {
+            if (player.max_rarity.gte(hasUpgrade('st',3)?10000:24000)) {
                 player.ap = player.ap.add(tmp.apGain)
                 player.aTimes++
 
@@ -130,27 +135,33 @@ const MAIN = {
         reset() {
             if (player.max_rarity.gte(tmp.mTierReq)) {
                 player.mastery_tier++
-				resetUpgrades('ap', hasUpgrade('es',2)?[]:[])
+				
 				
                 this.doReset()
             }
         },
         doReset() {
             player.ap = E(0)
-
+            resetUpgrades('ap', hasUpgrade('es',2)?[]:[])
             MAIN.asce.doReset()
         },
         effect() {
             let t = player.mastery_tier
 
-            let x = Math.pow(t+1,1/3)
+            let x = Math.pow(t*upgradeEffect('st',6,E(1)).toNumber()+1,1/3)
 
             let y = Decimal.pow(10,t-1).mul(t)
 
             return {luck: x, gen: y}
         },
         essGain() {
-            let x = tmp.mTierEff.gen.mul(upgradeEffect('pp',4)).mul(upgradeEffect('tp',7)).mul(upgradeEffect('es',7)).mul(upgradeEffect('ap',5))
+            let x = tmp.mTierEff.gen.mul(upgradeEffect('pp',4)).mul(upgradeEffect('tp',7)).mul(upgradeEffect('es',7)).mul(upgradeEffect('ap',5)).mul(upgradeEffect('st',2))
+
+            return x
+        },
+        stoneGain() {
+			if(player.mastery_tier<45)return E(0);
+            let x = E(player.mastery_tier).div(45).pow(25).mul(upgradeEffect('st',2));
 
             return x
         },
@@ -186,7 +197,7 @@ el.update.main = ()=>{
         tmp.el.asce_btn.setClasses({locked: tmp.apGain.lt(1), pres_btn: true})
 
         tmp.el.asce_btn.setHTML(`
-        (Require ${getRarityName(24000).bold()})<br>
+        (Require ${getRarityName(hasUpgrade('st',3)?10000:24000).bold()})<br>
         Ascend for ${tmp.apGain.format(0).bold()} Ascension Points
         `)
     } else if (tab == 2) {
@@ -204,6 +215,16 @@ el.update.main = ()=>{
                 `Your Mastery Tier is <h3>${format(player.mastery_tier,0)}</h3>, which boosts luck by ^<h3>${format(tmp.mTierEff.luck)}</h3> and generates <h3>${tmp.essGain.format()}</h3> Mastery Essence every second.`
             )
         }
+		
+        if (player.mastery_tier>=45) {
+            tmp.el.mastery_stone.setHTML(
+                `Your Mastery Tier is generating <h3>${tmp.stoneGain.format()}</h3> Mastery Stones every second.`
+            )
+        }else if (player.mastery_tier>0) {
+            tmp.el.mastery_stone.setHTML(
+                `Reach Mastery Tier 45 to gain Mastery Stone.`
+            )
+		}
     }
 
     // Luck Multiplier
@@ -220,4 +241,5 @@ tmp_update.push(()=>{
     tmp.mTierEff = MAIN.mastery.effect()
 
     tmp.essGain = MAIN.mastery.essGain()
+    tmp.stoneGain = MAIN.mastery.stoneGain()
 })
