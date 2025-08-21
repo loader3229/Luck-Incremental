@@ -4,9 +4,9 @@ const LUCK = {
         let x = E(1)
 
         x = x.mul(upgradeEffect('pp',0)[1]).mul(upgradeEffect('tp',0)[1]).mul(upgradeEffect('rp',0)[1]).mul(upgradeEffect('ap',0)[1]).mul(upgradeEffect('es',0)[1])
-if((sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44e2950549613ba148eff34250441a9b3121698a15fcefdb4f5a'))x = x.mul(10)
+if((window.supporterCodeInput))x = x.mul(10)
         x = x.pow(tmp.mTierEff.luck||1).pow(player.chall[1].add(1).log10().div(90).add(1).mul(player.chall[3].add(1).log10().div(90).add(1)).mul(player.chall[7].add(1).log10().div(90).add(1))).pow(upgradeEffect('se',2))
-if((sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44e2950549613ba148eff34250441a9b3121698a15fcefdb4f5a'))x = x.mul(1.01)
+if((window.supporterCodeInput))x = x.mul(1.01)
 
         return x
     },

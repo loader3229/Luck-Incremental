@@ -17,7 +17,7 @@ const MAIN = {
 
             x = x.mul(upgradeEffect('tp',1)).mul(upgradeEffect('rp',1)).mul(upgradeEffect('ap',1)).mul(upgradeEffect('es',1)[1])
 			
-if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44e2950549613ba148eff34250441a9b3121698a15fcefdb4f5a')x = x.mul(2);
+if(window.supporterCodeInput)x = x.mul(2);
             return x.floor()
         },
         reset() {
@@ -46,7 +46,7 @@ if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44
             x = x.mul(upgradeEffect('rp',2)).mul(upgradeEffect('ap',2)).mul(upgradeEffect('es',3)[1])
 
 
-if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44e2950549613ba148eff34250441a9b3121698a15fcefdb4f5a')x = x.mul(2);
+if(window.supporterCodeInput)x = x.mul(2);
             return x.floor()
         },
         reset() {
@@ -76,7 +76,7 @@ if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44
             x = x.mul(upgradeEffect('ap',3)).mul(upgradeEffect('es',4)[1])
 
 
-if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44e2950549613ba148eff34250441a9b3121698a15fcefdb4f5a')x = x.mul(2);
+if(window.supporterCodeInput)x = x.mul(2);
             return x.floor()
         },
         reset() {
@@ -105,7 +105,7 @@ if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44
 			x = x.mul(upgradeEffect('pp',7)).mul(upgradeEffect('ap',4)).mul(upgradeEffect('es',13)).mul(upgradeEffect('st',12)).mul(hasUpgrade('se',9)?player.chall[10].add(1).pow(player.upgrade.se[9].log10().add(1)):player.chall[10].add(1).log10().add(1))
 
 
-if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44e2950549613ba148eff34250441a9b3121698a15fcefdb4f5a')x = x.mul(2);
+if(window.supporterCodeInput)x = x.mul(2);
             return x.floor()
         },
         reset() {
@@ -183,7 +183,7 @@ if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44
 			if(player.currentChall == 11)return E(0);
             let x = tmp.mTierEff.gen.mul(upgradeEffect('pp',4)).mul(upgradeEffect('tp',7)).mul(upgradeEffect('es',7)).mul(upgradeEffect('ap',5)).mul(upgradeEffect('st',2)).mul(upgradeEffect('se',0))
 
-if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44e2950549613ba148eff34250441a9b3121698a15fcefdb4f5a')x = x.mul(2);
+if(window.supporterCodeInput)x = x.mul(2);
             return x
         },
         stoneGain() {
@@ -191,7 +191,7 @@ if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44
 			if(player.mastery_tier<45 && !hasUpgrade('se',4))return E(0);
             let x = E(player.mastery_tier).div(hasUpgrade('se',4)?E(40).div(player.upgrade.se[4].root(2)):45).add(player.upgrade.se[4]).pow(upgradeEffect('he',3).add(25)).mul(upgradeEffect('st',2)).mul(upgradeEffect('se',0)).mul(upgradeEffect('he',0));
 
-if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44e2950549613ba148eff34250441a9b3121698a15fcefdb4f5a')x = x.mul(2);
+if(window.supporterCodeInput)x = x.mul(2);
             return x
         },
         cloverGain() {
@@ -199,7 +199,7 @@ if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44
 			if(player.currentChall == 11)return E(0);
             let x = E(player.mastery_tier).div(1e12).pow(5).mul(upgradeEffect('cl',4));
 
-if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44e2950549613ba148eff34250441a9b3121698a15fcefdb4f5a')x = x.mul(2);
+if(window.supporterCodeInput)x = x.mul(2);
             return x
         },
     },
@@ -232,7 +232,7 @@ if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44
 			if(player.super_tier==0)return E(0);
             let x = E(player.mastery_tier).mul(player.super_tier).pow(Math.log10((player.super_tier+1)**3+2)+2).mul(upgradeEffect('st',11)).mul(upgradeEffect('se',14)).mul(upgradeEffect('he',0));
 
-if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44e2950549613ba148eff34250441a9b3121698a15fcefdb4f5a')x = x.mul(2);
+if(window.supporterCodeInput)x = x.mul(2);
             return x
         },
     },
@@ -260,7 +260,7 @@ if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44
 			if(player.hyper_tier==0)return E(0);
             let x = E(player.super_tier).mul(player.hyper_tier).pow(Math.log10((player.hyper_tier+1)**3+2));
 
-if(sha512_256(localStorage.supporterCode+"loader3229").slice(2) == '97b4061c3a44e2950549613ba148eff34250441a9b3121698a15fcefdb4f5a')x = x.mul(2);
+if(window.supporterCodeInput)x = x.mul(2);
             return x
         },
     },
